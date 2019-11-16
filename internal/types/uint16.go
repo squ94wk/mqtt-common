@@ -10,7 +10,8 @@ func WriteUInt16(writer io.Writer, value uint16) error {
 		byte(value >> 8),
 		byte(value),
 	}
-	if _, err := writer.Write(encoded); err != nil {
+	_, err := writer.Write(encoded)
+	if err != nil {
 		return fmt.Errorf("failed to write uint16: %v", err)
 	}
 
@@ -19,7 +20,8 @@ func WriteUInt16(writer io.Writer, value uint16) error {
 
 func ReadUInt16(reader io.Reader) (uint16, error) {
 	var buf [2]byte
-	if _, err := io.ReadFull(reader, buf[:2]); err != nil {
+	_, err := io.ReadFull(reader, buf[:2])
+	if err != nil {
 		return 0, fmt.Errorf("failed to read uint16: %v", err)
 	}
 

@@ -5,17 +5,21 @@ import (
 	"io"
 )
 
+const maxBinaryLength = 1<<16 - 1
+
 func WriteBinary(writer io.Writer, value []byte) error {
-	size := len(value)
-	if size > int(^uint16(0)) {
-		return fmt.Errorf("failed to write binary type: value too long ('%d' bytes > max = %d)", size, 2<<15)
+	if len(value) > maxBinaryLength {
+		return fmt.Errorf("failed to write binary type: value too long ('%d' bytes > max = %d)", len(value), 2<<15)
 	}
 
-	if err := WriteUInt16(writer, uint16(size)); err != nil {
+	size := uint16(len(value))
+	err := WriteUInt16(writer, size)
+	if err != nil {
 		return fmt.Errorf("failed to write binary type: failed to write size '%d' encoded as two byte integer %v", size, err)
 	}
 
-	if _, err := writer.Write(value); err != nil {
+	_, err = writer.Write(value)
+	if err != nil {
 		return fmt.Errorf("failed to write binary type: failed to write payload: %v", err)
 	}
 
@@ -33,7 +37,8 @@ func ReadBinary(reader io.Reader) ([]byte, error) {
 	}
 
 	buf := make([]byte, size)
-	if _, err := io.ReadFull(reader, buf); err != nil {
+	_, err = io.ReadFull(reader, buf[:])
+	if err != nil {
 		return nil, fmt.Errorf("failed to read binary type: failed to read payload: %v", err)
 	}
 

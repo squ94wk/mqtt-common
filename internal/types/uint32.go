@@ -13,7 +13,8 @@ func WriteUInt32(writer io.Writer, value uint32) error {
 		byte(value),
 	}
 
-	if _, err := writer.Write(encoded); err != nil {
+	_, err := writer.Write(encoded)
+	if err != nil {
 		return fmt.Errorf("failed to write uint32: %v", err)
 	}
 	return nil
@@ -21,7 +22,8 @@ func WriteUInt32(writer io.Writer, value uint32) error {
 
 func ReadUInt32(reader io.Reader) (uint32, error) {
 	var buf [4]byte
-	if _, err := io.ReadFull(reader, buf[:4]); err != nil {
+	_, err := io.ReadFull(reader, buf[:])
+	if err != nil {
 		return 0, fmt.Errorf("failed to read uint32: %v", err)
 	}
 

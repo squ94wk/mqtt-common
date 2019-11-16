@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/squ94wk/mqtt-common/pkg/types"
+	"github.com/squ94wk/mqtt-common/internal/types"
 )
 
 type propReader func(io.Reader, PropId) (Property, error)

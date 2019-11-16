@@ -5,13 +5,17 @@ import (
 	"io"
 )
 
-const UTF8StringMaxLength = 65535
+const UTF8StringMaxLength uint16 = 1<<16 - 1
 
 func WriteString(writer io.Writer, value string) error {
-	if err := WriteUInt16(writer, uint16(len(value))); err != nil {
+	length := uint16(len(value))
+	err := WriteUInt16(writer, length)
+	if err != nil {
 		return fmt.Errorf("failed to write length of UTF8 encoded string: %v", err)
 	}
-	if _, err := writer.Write([]byte(value)); err != nil {
+
+	_, err = writer.Write([]byte(value))
+	if err != nil {
 		return fmt.Errorf("failed to write UTF8 encoded string: %v", err)
 	}
 
@@ -29,7 +33,8 @@ func ReadString(reader io.Reader) (string, error) {
 	}
 
 	buf := make([]byte, size)
-	if _, err := io.ReadFull(reader, buf); err != nil {
+	_, err = io.ReadFull(reader, buf)
+	if err != nil {
 		return "", fmt.Errorf("failed to read UTF8 encoded string: %v", err)
 	}
 

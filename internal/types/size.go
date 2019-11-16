@@ -17,14 +17,14 @@ func UInt32Size(i uint32) uint32 {
 }
 
 func VarIntSize(i uint32) uint32 {
-	if i > 2<<21 {
+	switch {
+	case i > 1<<22:
 		return 4
-	}
-	if i > 2<<14 {
+	case i > 1<<15:
 		return 3
-	}
-	if i > 2<<7 {
+	case i > 1<<8:
 		return 2
+	default:
+		return 1
 	}
-	return 1
 }

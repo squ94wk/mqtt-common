@@ -6,7 +6,7 @@ import (
 	"io"
 
 	"github.com/squ94wk/mqtt-common/pkg/topic"
-	"github.com/squ94wk/mqtt-common/pkg/types"
+	"github.com/squ94wk/mqtt-common/internal/types"
 )
 
 type Connect struct {

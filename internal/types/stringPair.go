@@ -49,7 +49,3 @@ func ReadStringPair(reader io.Reader) (StringPair, error) {
 
 	return StringPair{key, value}, nil
 }
-
-func (p StringPair) Size() int {
-	return 4 + len(p.Key()) + len(p.Value())
-}
