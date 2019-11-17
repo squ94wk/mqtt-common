@@ -1,6 +1,7 @@
 package packet
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -34,4 +35,71 @@ const (
 
 type Packet interface {
 	Write(io.Writer) error
+}
+
+func ReadPacket(reader io.Reader) (Packet, error) {
+	var header header
+	if err := readHeader(reader, &header); err != nil {
+		return nil, fmt.Errorf("failed to read packet: failed to read header: %v", err)
+	}
+
+	pkt, err := readRestOfPacket(reader, header)
+	if err != nil {
+		return nil, err
+	}
+
+	return pkt, nil
+}
+
+func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
+	switch header.MsgType() {
+	case CONNECT:
+		if header.Flags() != 0 {
+			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connect packet: invalid flags '%d'", header.Flags())
+		}
+		var connect Connect
+		err := ReadConnect(reader, &connect, header)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read Connect packet: %v", err)
+		}
+		return &connect, nil
+
+	case PUBLISH:
+		//var publish Publish
+		//err := ReadPublish(reader, &publish, header)
+		//if err != nil {
+		//return nil, fmt.Errorf("failed to read Publish packet: %v", err)
+		//}
+		//log.Info("read Publish packet")
+		//return &publish, nil
+
+	case CONNACK:
+	case PUBACK:
+	case PUBREC:
+	case PUBREL:
+	case PUBCOMP:
+	case SUBSCRIBE:
+	case SUBACK:
+	case UNSUBSCRIBE:
+	case UNSUBACK:
+	case PINGREQ:
+	case PINGRESP:
+		panic("implement me")
+
+	case DISCONNECT:
+		//if header.Flags() != 0 {
+		//return nil, fmt.Errorf("failed to read packet: invalid fixed header of Disconnect packet: invalid flags '%d'", header.Flags())
+		//}
+		//var disconnect Disconnect
+		//err := ReadDisconnect(reader, &disconnect, header)
+		//if err != nil {
+		//return nil, fmt.Errorf("failed to read Disconnect packet: %v", err)
+		//}
+		//log.Info("read Disconnect packet")
+		//return &disconnect, nil
+
+	case AUTH:
+		panic("implement me")
+	}
+	return nil, fmt.Errorf("header with invalid packet type '%v'", header.MsgType())
 }
