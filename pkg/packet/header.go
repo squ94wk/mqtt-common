@@ -27,7 +27,7 @@ func (h header) Length() uint32 {
 
 func readHeader(reader io.Reader, header *header) error {
 	var buf [1]byte
-	if _, err := io.ReadFull(reader, buf[:1]); err != nil {
+	if _, err := io.ReadFull(reader, buf[:]); err != nil {
 		return fmt.Errorf("failed to read packet header: %v", err)
 	}
 
@@ -37,8 +37,8 @@ func readHeader(reader io.Reader, header *header) error {
 		return fmt.Errorf("failed to read packet header: %v", err)
 	}
 
-	header.flags = buf[0] >> 4
-	header.pktType = Type(int8(buf[0] >> 4 << 4))
-	header.length = uint32(remainingLength)
+	header.flags = buf[0] << 4 >> 4
+	header.pktType = Type(int8(buf[0] >> 4))
+	header.length = remainingLength
 	return nil
 }

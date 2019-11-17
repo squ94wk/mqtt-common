@@ -74,6 +74,16 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		//return &publish, nil
 
 	case CONNACK:
+		if header.Flags() != 0 {
+			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connack packet: invalid flags '%d'", header.Flags())
+		}
+		var connack Connack
+		err := ReadConnack(reader, &connack, header)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read connack packet: %v", err)
+		}
+		return &connack, nil
+
 	case PUBACK:
 	case PUBREC:
 	case PUBREL:

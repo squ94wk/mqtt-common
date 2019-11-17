@@ -18,7 +18,7 @@ func TestReadConnect(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    Connect
+		want    *Connect
 		wantErr bool
 	}{
 		{
@@ -31,57 +31,54 @@ func TestReadConnect(t *testing.T) {
 					[]byte{0, 0}))},
 			wantErr: true,
 		},
+
 		{
 			name: "connect1",
 			args: args{
 				reader: bytes.NewReader(connect1Bin.Bytes())},
-			want: connect1,
+			want: &connect1,
 		},
+
 		{
 			name: "connect2",
 			args: args{
 				reader: bytes.NewReader(connect2Bin.Bytes())},
-			want: connect2,
+			want: &connect2,
 		},
+
 		{
 			name: "connect3",
 			args: args{
 				reader: bytes.NewReader(connect3Bin.Bytes())},
-			want: connect3,
+			want: &connect3,
 		},
+
 		{
 			name: "connect4",
 			args: args{
 				reader: bytes.NewReader(connect4Bin.Bytes())},
-			want: connect4,
+			want: &connect4,
 		},
+
 		{
 			name: "connect5",
 			args: args{
 				reader: bytes.NewReader(connect5Bin.Bytes())},
-			want: connect5,
+			want: &connect5,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var header header
-			if err := readHeader(tt.args.reader, &header); err != nil {
+			pkt, err := ReadPacket(tt.args.reader)
+			if err != nil {
 				if !tt.wantErr {
 					t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				return
 			}
 
-			var connect Connect
-			if err := ReadConnect(tt.args.reader, &connect, header); err != nil {
-				if !tt.wantErr {
-					t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
-				}
-				return
-			}
-
-			if diff := deep.Equal(tt.want, connect); diff != nil {
+			if diff := deep.Equal(tt.want, pkt); diff != nil {
 				t.Error(diff)
 				return
 			}

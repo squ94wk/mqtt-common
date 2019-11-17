@@ -17,51 +17,46 @@ func TestReadConnack(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    Connack
+		want    *Connack
 		wantErr bool
 	}{
-		//{
-		//name: "Invalid flags => err", args: args{
-		//reader: bytes.NewReader(help.Concat(
-		//[]byte{2, byte(Success)},
-		//)),
-		//},
-		//wantErr: true,
-		//},
-		//{
-		//name: "connack1",
-		//args: args{
-		//reader: bytes.NewReader(connack1Bin.Bytes()),
-		//},
-		//want: connack1,
-		//},
-		//{
-		//name: "connack2",
-		//args: args{
-		//reader: bytes.NewReader(connack2Bin.Bytes()),
-		//},
-		//want: connack2,
-		//},
+		{
+			name: "Invalid flags => err", args: args{
+				reader: bytes.NewReader(help.Concat(
+					[]byte{2, byte(Success)},
+				)),
+			},
+			wantErr: true,
+		},
+
+		{
+			name: "connack1",
+			args: args{
+				reader: bytes.NewReader(connack1Bin.Bytes()),
+			},
+			want: &connack1,
+		},
+
+		{
+			name: "connack2",
+			args: args{
+				reader: bytes.NewReader(connack2Bin.Bytes()),
+			},
+			want: &connack2,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var header header
-			if err := readHeader(tt.args.reader, &header); err != nil {
+			pkt, err := ReadPacket(tt.args.reader)
+			if err != nil {
 				if !tt.wantErr {
 					t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				return
 			}
 
-			var connack Connack
-			if err := ReadConnack(tt.args.reader, &connack, header); err != nil {
-				if !tt.wantErr {
-					t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
-				}
-				return
-			}
-			if diff := deep.Equal(connack, tt.want); diff != nil {
+			if diff := deep.Equal(tt.want, pkt); diff != nil {
 				t.Error(diff)
 			}
 		})
@@ -80,6 +75,7 @@ func TestConnackWrite(t *testing.T) {
 			connack:    connack1,
 			wantWriter: connack1Bin,
 		},
+
 		{
 			name:       "connack2",
 			connack:    connack2,
