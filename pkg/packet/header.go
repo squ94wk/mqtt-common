@@ -42,17 +42,3 @@ func readHeader(reader io.Reader, header *header) error {
 	header.length = uint32(remainingLength)
 	return nil
 }
-
-//func (h header) Write(writer io.Writer) error {
-//typeSpecificByte := (byte(h.pktType) << 4) & h.flags
-//if err := writer.Write([]byte{typeSpecificByte}); err != nil {
-//return fmt.Errorf("failed to write fixed header. couldn't write type & flags. %v", err)
-//}
-
-//// remaining length
-//if err = types.WriteVarInt(writer, h.Length()); err != nil {
-//return fmt.Errorf("failed to write fixed header. couldn't write length. %v", err)
-//}
-
-//return nil
-//}
