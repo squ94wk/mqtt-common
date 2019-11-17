@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/squ94wk/mqtt-common/pkg/topic"
 	"github.com/squ94wk/mqtt-common/internal/types"
+	"github.com/squ94wk/mqtt-common/pkg/topic"
 )
 
 type Connect struct {
@@ -131,7 +131,7 @@ func (p *ConnectPayload) SetWillRetain(willRetain bool) {
 	p.willRetain = willRetain
 }
 
-func ReadConnect(origReader io.Reader, connect *Connect, header Header) error {
+func ReadConnect(origReader io.Reader, connect *Connect, header header) error {
 	reader := io.LimitReader(origReader, int64(header.Length()))
 
 	// 3.1.2 Variable header

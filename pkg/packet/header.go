@@ -7,25 +7,25 @@ import (
 	"github.com/squ94wk/mqtt-common/internal/types"
 )
 
-type Header struct {
+type header struct {
 	pktType Type
 	flags   byte
 	length  uint32
 }
 
-func (h Header) MsgType() Type {
+func (h header) MsgType() Type {
 	return h.pktType
 }
 
-func (h Header) Flags() byte {
+func (h header) Flags() byte {
 	return h.flags
 }
 
-func (h Header) Length() uint32 {
+func (h header) Length() uint32 {
 	return h.length
 }
 
-func ReadHeader(reader io.Reader, header *Header) error {
+func readHeader(reader io.Reader, header *header) error {
 	var buf [1]byte
 	if _, err := io.ReadFull(reader, buf[:1]); err != nil {
 		return fmt.Errorf("failed to read packet header: %v", err)
@@ -43,7 +43,7 @@ func ReadHeader(reader io.Reader, header *Header) error {
 	return nil
 }
 
-//func (h Header) Write(writer io.Writer) error {
+//func (h header) Write(writer io.Writer) error {
 //typeSpecificByte := (byte(h.pktType) << 4) & h.flags
 //if err := writer.Write([]byte{typeSpecificByte}); err != nil {
 //return fmt.Errorf("failed to write fixed header. couldn't write type & flags. %v", err)

@@ -65,8 +65,8 @@ func TestReadConnect(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var header Header
-			if err := ReadHeader(tt.args.reader, &header); err != nil {
+			var header header
+			if err := readHeader(tt.args.reader, &header); err != nil {
 				if !tt.wantErr {
 					t.Errorf("Read() error = %v, wantErr %v", err, tt.wantErr)
 				}
