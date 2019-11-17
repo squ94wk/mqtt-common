@@ -12,13 +12,13 @@ import (
 type Connect struct {
 	keepAlive  uint16
 	cleanStart bool
-	properties
-	payload ConnectPayload
+	props      map[PropId][]Property
+	payload    ConnectPayload
 }
 
 type ConnectPayload struct {
-	clientId string
-	properties
+	clientId    string
+	willProps   map[PropId][]Property
 	willRetain  bool
 	willQoS     QoS
 	willTopic   topic.Topic
@@ -42,10 +42,10 @@ func NewConnect(
 	return Connect{
 		keepAlive:  keepAlive,
 		cleanStart: cleanStart,
-		properties: properties{props},
+		props:      props,
 		payload: ConnectPayload{
 			clientId:    clientId,
-			properties:  properties{willProps},
+			willProps:   willProps,
 			willRetain:  willRetain,
 			willQoS:     willQoS,
 			willTopic:   willTopic,
@@ -74,6 +74,25 @@ func (c Connect) Props() map[PropId][]Property {
 	return c.props
 }
 
+func (p *Connect) ResetProps() {
+	p.props = make(map[PropId][]Property)
+}
+
+func (p *Connect) SetProps(props map[PropId][]Property) {
+	p.props = props
+}
+
+func (p *Connect) AddProp(prop Property) {
+	propId := prop.PropId()
+
+	properties, ok := p.props[propId]
+	if !ok {
+		p.props[propId] = []Property{prop}
+	} else {
+		p.props[propId] = append(properties, prop)
+	}
+}
+
 func (c Connect) Payload() ConnectPayload {
 	return c.payload
 }
@@ -86,7 +105,26 @@ func (p *ConnectPayload) SetClientId(clientId string) {
 }
 
 func (p ConnectPayload) WillProps() map[PropId][]Property {
-	return p.props
+	return p.willProps
+}
+
+func (p *ConnectPayload) ResetWillProps() {
+	p.willProps = make(map[PropId][]Property)
+}
+
+func (p *ConnectPayload) SetWillProps(props map[PropId][]Property) {
+	p.willProps = props
+}
+
+func (p *ConnectPayload) AddWillProp(prop Property) {
+	propId := prop.PropId()
+
+	properties, ok := p.willProps[propId]
+	if !ok {
+		p.willProps[propId] = []Property{prop}
+	} else {
+		p.willProps[propId] = append(properties, prop)
+	}
 }
 
 func (p ConnectPayload) WillTopic() topic.Topic {
@@ -131,12 +169,129 @@ func (p *ConnectPayload) SetWillRetain(willRetain bool) {
 	p.willRetain = willRetain
 }
 
+func (c Connect) Write(writer io.Writer) error {
+	// 3.1.1 Fixed header
+	firstHeaderByte := byte(CONNECT) << 4
+	if _, err := writer.Write([]byte{firstHeaderByte}); err != nil {
+		return fmt.Errorf("failed to write connect packet: failed to write fixed header: %v", err)
+	}
+
+	// Remaining length
+	var remainingLength uint32 = 7 + 1 + 2 // protocol name & version, flags, keep alive
+	remainingLength += propertiesSize(c.props)
+	remainingLength += types.StringSize(c.payload.clientId)
+	if c.payload.willTopic != "" {
+		remainingLength += propertiesSize(c.payload.willProps)
+		remainingLength += types.StringSize(string(c.payload.willTopic))
+		remainingLength += types.BinarySize(c.payload.willPayload)
+	}
+	if c.payload.username != "" {
+		remainingLength += types.StringSize(c.payload.username)
+	}
+	if c.payload.password != nil {
+		remainingLength += types.BinarySize(c.payload.password)
+	}
+	if err := types.WriteVarInt(writer, remainingLength); err != nil {
+		return fmt.Errorf("failed to write connect packet: failed to write remaining packet length: %v", err)
+	}
+
+	// 3.1.2 Variable header
+	// 3.1.2.1 Protocol Name
+	// 3.1.2.2 Protocol Version
+	if _, err := writer.Write([]byte{0, 4, 'M', 'Q', 'T', 'T', 5}); err != nil {
+		return fmt.Errorf("failed to write connect packet: failed to write protocol info: %v", err)
+	}
+
+	// 3.1.2.3 Connect Flags
+	var flags byte = 0
+	// reserved
+	flags |= 0
+	if c.cleanStart {
+		flags |= 1 << 1
+	}
+	if c.payload.willTopic != "" {
+		flags |= 1 << 2
+	}
+	switch c.payload.willQoS {
+	case Qos0:
+	case Qos1:
+		flags |= 1 << 3
+	case Qos2:
+		flags |= 1 << 4
+	default:
+		panic(fmt.Errorf("invalid option for QoS: %v", c.payload.willQoS))
+	}
+	if c.payload.willRetain {
+		flags |= 1 << 5
+	}
+	if c.payload.password != nil {
+		flags |= 1 << 6
+	}
+	if c.payload.username != "" {
+		flags |= 1 << 7
+	}
+
+	if _, err := writer.Write([]byte{flags}); err != nil {
+		return fmt.Errorf("failed to write connect packet: failed to write flags: %v", err)
+	}
+
+	// 3.1.2.10 Keep Alive
+	if err := types.WriteUInt16(writer, c.keepAlive); err != nil {
+		return fmt.Errorf("failed to write connect packet: failed to write keep alive: %v", err)
+	}
+
+	// 3.1.2.11 Properties
+	if err := WriteProperties(writer, c.props); err != nil {
+		return fmt.Errorf("failed to write connect packet: %v", err)
+	}
+
+	// 3.1.3 Payload
+	// 3.1.3.1 ClientID
+	if err := types.WriteString(writer, c.payload.clientId); err != nil {
+		return fmt.Errorf("failed to write connect packet: failed to write client id: %v", err)
+	}
+
+	// 3.1.3.2 Will properties
+	if c.payload.willTopic != "" {
+		// 3.1.3.2.1 Property length
+		if err := WriteProperties(writer, c.payload.willProps); err != nil {
+			return fmt.Errorf("failed to write connect packet: failed to write will properties: %v", err)
+		}
+
+		// 3.1.3.3 Will topic
+		if err := types.WriteString(writer, string(c.payload.willTopic)); err != nil {
+			return fmt.Errorf("failed to write connect packet: failed to write will topic: %v", err)
+		}
+
+		// 3.1.3.4 Will payload
+		if err := types.WriteBinary(writer, c.payload.willPayload); err != nil {
+			return fmt.Errorf("failed to write connect packet: failed to write will payload: %v", err)
+		}
+	}
+
+	// 3.1.3.5 User name
+	if c.payload.username != "" {
+		if err := types.WriteString(writer, c.payload.username); err != nil {
+			return fmt.Errorf("failed to write connect packet: failed to write username: %v", err)
+		}
+	}
+
+	// 3.1.3.6 Password
+	if c.payload.password != nil {
+		if err := types.WriteBinary(writer, c.payload.password); err != nil {
+			return fmt.Errorf("failed to write Connect packet: failed to write password: %v", err)
+		}
+	}
+
+	return nil
+}
+
 func readConnect(origReader io.Reader, connect *Connect, header header) error {
 	reader := io.LimitReader(origReader, int64(header.length))
 
 	// 3.1.2 Variable header
 	var buf [8]byte
-	if _, err := io.ReadFull(reader, buf[:8]); err != nil {
+	if _, err := io.ReadFull(reader, buf[:]); err != nil {
 		return fmt.Errorf("failed to read connect packet: failed to read variable header: %v", err)
 	}
 
@@ -211,9 +366,9 @@ func readConnect(origReader io.Reader, connect *Connect, header header) error {
 	if hasWill {
 		payload.SetWillQoS(willQoS)
 
-		payload.ResetProps()
+		payload.ResetWillProps()
 		// 3.1.3.2 Will properties
-		err := readProperties(reader, payload.props)
+		err := readProperties(reader, payload.willProps)
 		if err != nil {
 			return fmt.Errorf("failed to read connect packet: failed to read will properties: %v", err)
 		}
@@ -252,123 +407,6 @@ func readConnect(origReader io.Reader, connect *Connect, header header) error {
 	}
 
 	connect.payload = payload
-
-	return nil
-}
-
-func (c Connect) Write(writer io.Writer) error {
-	// 3.1.1 Fixed header
-	firstHeaderByte := byte(CONNECT) << 4
-	if _, err := writer.Write([]byte{firstHeaderByte}); err != nil {
-		return fmt.Errorf("failed to write connect packet: failed to write fixed header: %v", err)
-	}
-
-	// Remaining length
-	var remainingLength uint32 = 7 + 1 + 2 // protocol name & version, flags, keep alive
-	remainingLength += propertiesSize(c.props)
-	remainingLength += types.StringSize(c.payload.clientId)
-	if c.payload.willTopic != "" {
-		remainingLength += propertiesSize(c.payload.props)
-		remainingLength += types.StringSize(string(c.payload.willTopic))
-		remainingLength += types.BinarySize(c.payload.willPayload)
-	}
-	if c.payload.username != "" {
-		remainingLength += types.StringSize(c.payload.username)
-	}
-	if c.payload.password != nil {
-		remainingLength += types.BinarySize(c.payload.password)
-	}
-	if err := types.WriteVarInt(writer, remainingLength); err != nil {
-		return fmt.Errorf("failed to write connect packet: failed to write remaining packet length: %v", err)
-	}
-
-	// 3.1.2 Variable header
-	// 3.1.2.1 Protocol Name
-	// 3.1.2.2 Protocol Version
-	if _, err := writer.Write([]byte{0, 4, 'M', 'Q', 'T', 'T', 5}); err != nil {
-		return fmt.Errorf("failed to write connect packet: failed to write protocol info: %v", err)
-	}
-
-	// 3.1.2.3 Connect Flags
-	var flags byte = 0
-	// reserved
-	flags |= 0
-	if c.cleanStart {
-		flags |= 1 << 1
-	}
-	if c.payload.willTopic != "" {
-		flags |= 1 << 2
-	}
-	switch c.payload.willQoS {
-	case Qos0:
-	case Qos1:
-		flags |= 1 << 3
-	case Qos2:
-		flags |= 1 << 4
-	default:
-		panic(fmt.Errorf("invalid option for QoS: %v", c.payload.willQoS))
-	}
-	if c.payload.willRetain {
-		flags |= 1 << 5
-	}
-	if c.payload.password != nil {
-		flags |= 1 << 6
-	}
-	if c.payload.username != "" {
-		flags |= 1 << 7
-	}
-
-	if _, err := writer.Write([]byte{flags}); err != nil {
-		return fmt.Errorf("failed to write connect packet: failed to write flags: %v", err)
-	}
-
-	// 3.1.2.10 Keep Alive
-	if err := types.WriteUInt16(writer, c.keepAlive); err != nil {
-		return fmt.Errorf("failed to write connect packet: failed to write keep alive: %v", err)
-	}
-
-	// 3.1.2.11 Properties
-	if err := WriteProperties(writer, c.props); err != nil {
-		return fmt.Errorf("failed to write connect packet: %v", err)
-	}
-
-	// 3.1.3 Payload
-	// 3.1.3.1 ClientID
-	if err := types.WriteString(writer, c.payload.clientId); err != nil {
-		return fmt.Errorf("failed to write connect packet: failed to write client id: %v", err)
-	}
-
-	// 3.1.3.2 Will properties
-	if c.payload.willTopic != "" {
-		// 3.1.3.2.1 Property length
-		if err := WriteProperties(writer, c.payload.props); err != nil {
-			return fmt.Errorf("failed to write connect packet: failed to write will properties: %v", err)
-		}
-
-		// 3.1.3.3 Will topic
-		if err := types.WriteString(writer, string(c.payload.willTopic)); err != nil {
-			return fmt.Errorf("failed to write connect packet: failed to write will topic: %v", err)
-		}
-
-		// 3.1.3.4 Will payload
-		if err := types.WriteBinary(writer, c.payload.willPayload); err != nil {
-			return fmt.Errorf("failed to write connect packet: failed to write will payload: %v", err)
-		}
-	}
-
-	// 3.1.3.5 User name
-	if c.payload.username != "" {
-		if err := types.WriteString(writer, c.payload.username); err != nil {
-			return fmt.Errorf("failed to write connect packet: failed to write username: %v", err)
-		}
-	}
-
-	// 3.1.3.6 Password
-	if c.payload.password != nil {
-		if err := types.WriteBinary(writer, c.payload.password); err != nil {
-			return fmt.Errorf("failed to write Connect packet: failed to write password: %v", err)
-		}
-	}
 
 	return nil
 }

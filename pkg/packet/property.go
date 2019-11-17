@@ -53,10 +53,6 @@ type BinaryProp struct {
 	payload []byte
 }
 
-type properties struct {
-	props map[PropId][]Property
-}
-
 const (
 	PayloadFormatIndicator          PropId = 1
 	MessageExpiryInterval                  = 2
@@ -169,23 +165,4 @@ func propertiesSize(props map[PropId][]Property) uint32 {
 	}
 
 	return types.VarIntSize(propLength) + propLength
-}
-
-func (p *properties) ResetProps() {
-	p.props = make(map[PropId][]Property)
-}
-
-func (p *properties) SetProps(props map[PropId][]Property) {
-	p.props = props
-}
-
-func (p *properties) AddProp(prop Property) {
-	propId := prop.PropId()
-
-	properties, ok := p.props[propId]
-	if !ok {
-		p.props[propId] = []Property{prop}
-	} else {
-		p.props[propId] = append(properties, prop)
-	}
 }
