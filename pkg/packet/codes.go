@@ -1,6 +1,6 @@
 package packet
 
-type ConnectReason uint8
+type ConnectReason byte
 
 const (
 	Success                     ConnectReason = 0   // The Connection is accepted.

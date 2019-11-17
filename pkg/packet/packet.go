@@ -5,9 +5,9 @@ import (
 	"io"
 )
 
-type Type int8
+type pktType byte
 
-type QoS int8
+type QoS byte
 
 const (
 	Qos0 = QoS(0)
@@ -16,7 +16,7 @@ const (
 )
 
 const (
-	CONNECT Type = iota + 1
+	CONNECT pktType = iota + 1
 	CONNACK
 	PUBLISH
 	PUBACK
@@ -52,13 +52,13 @@ func ReadPacket(reader io.Reader) (Packet, error) {
 }
 
 func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
-	switch header.MsgType() {
+	switch header.pktType {
 	case CONNECT:
-		if header.Flags() != 0 {
-			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connect packet: invalid flags '%d'", header.Flags())
+		if header.flags != 0 {
+			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connect packet: invalid flags '%d'", header.flags)
 		}
 		var connect Connect
-		err := ReadConnect(reader, &connect, header)
+		err := readConnect(reader, &connect, header)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read Connect packet: %v", err)
 		}
@@ -74,11 +74,11 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		//return &publish, nil
 
 	case CONNACK:
-		if header.Flags() != 0 {
-			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connack packet: invalid flags '%d'", header.Flags())
+		if header.flags != 0 {
+			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connack packet: invalid flags '%d'", header.flags)
 		}
 		var connack Connack
-		err := ReadConnack(reader, &connack, header)
+		err := readConnack(reader, &connack, header)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read connack packet: %v", err)
 		}
@@ -111,5 +111,5 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 	case AUTH:
 		panic("implement me")
 	}
-	return nil, fmt.Errorf("header with invalid packet type '%v'", header.MsgType())
+	return nil, fmt.Errorf("header with invalid packet type '%v'", header.pktType)
 }

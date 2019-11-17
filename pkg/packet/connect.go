@@ -131,8 +131,8 @@ func (p *ConnectPayload) SetWillRetain(willRetain bool) {
 	p.willRetain = willRetain
 }
 
-func ReadConnect(origReader io.Reader, connect *Connect, header header) error {
-	reader := io.LimitReader(origReader, int64(header.Length()))
+func readConnect(origReader io.Reader, connect *Connect, header header) error {
+	reader := io.LimitReader(origReader, int64(header.length))
 
 	// 3.1.2 Variable header
 	var buf [8]byte

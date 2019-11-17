@@ -8,21 +8,9 @@ import (
 )
 
 type header struct {
-	pktType Type
+	pktType pktType
 	flags   byte
 	length  uint32
-}
-
-func (h header) MsgType() Type {
-	return h.pktType
-}
-
-func (h header) Flags() byte {
-	return h.flags
-}
-
-func (h header) Length() uint32 {
-	return h.length
 }
 
 func readHeader(reader io.Reader, header *header) error {
@@ -38,7 +26,7 @@ func readHeader(reader io.Reader, header *header) error {
 	}
 
 	header.flags = buf[0] << 4 >> 4
-	header.pktType = Type(int8(buf[0] >> 4))
+	header.pktType = pktType(buf[0] >> 4)
 	header.length = remainingLength
 	return nil
 }

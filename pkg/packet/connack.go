@@ -52,8 +52,8 @@ func (c *Connack) ResetProps() {
 	c.props = make(map[PropId][]Property)
 }
 
-func ReadConnack(reader io.Reader, connack *Connack, header header) error {
-	limitReader := io.LimitReader(reader, int64(header.Length()))
+func readConnack(reader io.Reader, connack *Connack, header header) error {
+	limitReader := io.LimitReader(reader, int64(header.length))
 
 	// 3.2.2 Variable header
 	var buf [2]byte
