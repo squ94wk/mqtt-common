@@ -103,7 +103,7 @@ func readByteProp(reader io.Reader, propId PropId) (Property, error) {
 	if _, err := io.ReadFull(reader, buf[:1]); err != nil {
 		return nil, fmt.Errorf("failed to read byte property: %v", err)
 	}
-	return ByteProp{payload: buf[0], property: property{propId}}, nil
+	return ByteProp{value: buf[0], property: property{propId}}, nil
 }
 
 func readInt32Prop(reader io.Reader, propId PropId) (Property, error) {
@@ -112,7 +112,7 @@ func readInt32Prop(reader io.Reader, propId PropId) (Property, error) {
 		return nil, fmt.Errorf("failed to read four byte integer property: %v", err)
 	}
 
-	return Int32Prop{payload: val, property: property{propId}}, nil
+	return Int32Prop{value: val, property: property{propId}}, nil
 }
 
 func readInt16Prop(reader io.Reader, propId PropId) (Property, error) {
@@ -121,7 +121,7 @@ func readInt16Prop(reader io.Reader, propId PropId) (Property, error) {
 		return nil, fmt.Errorf("failed to read two byte integer property: %v", err)
 	}
 
-	return Int16Prop{payload: val, property: property{propId}}, nil
+	return Int16Prop{value: val, property: property{propId}}, nil
 }
 
 func readStringProp(reader io.Reader, propId PropId) (Property, error) {
@@ -130,7 +130,7 @@ func readStringProp(reader io.Reader, propId PropId) (Property, error) {
 		return nil, fmt.Errorf("failed to read string property: %v", err)
 	}
 
-	return StringProp{payload: val, property: property{propId}}, nil
+	return StringProp{value: val, property: property{propId}}, nil
 }
 
 func readKeyValueProp(reader io.Reader, propId PropId) (Property, error) {
@@ -139,7 +139,7 @@ func readKeyValueProp(reader io.Reader, propId PropId) (Property, error) {
 		return nil, fmt.Errorf("failed to read string pair property: %v", err)
 	}
 
-	return KeyValueProp{payload: val, property: property{propId}}, nil
+	return KeyValueProp{value: val, property: property{propId}}, nil
 }
 
 func readVarIntProp(reader io.Reader, propId PropId) (Property, error) {
@@ -148,7 +148,7 @@ func readVarIntProp(reader io.Reader, propId PropId) (Property, error) {
 		return nil, fmt.Errorf("failed to read variable length int property: %v", err)
 	}
 
-	return VarIntProp{payload: val, property: property{propId}}, nil
+	return VarIntProp{value: val, property: property{propId}}, nil
 }
 
 func readBinaryProp(reader io.Reader, propId PropId) (Property, error) {
@@ -157,5 +157,5 @@ func readBinaryProp(reader io.Reader, propId PropId) (Property, error) {
 		return nil, fmt.Errorf("failed to read string pair property: %v", err)
 	}
 
-	return BinaryProp{payload: val, property: property{propId}}, nil
+	return BinaryProp{value: val, property: property{propId}}, nil
 }

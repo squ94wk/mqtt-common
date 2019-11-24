@@ -13,7 +13,7 @@ func (prop ByteProp) Write(writer io.Writer) error {
 		return fmt.Errorf("failed to write byte property. failed to write identifier '%d': %v", prop.PropId(), err)
 	}
 
-	_, err = writer.Write([]byte{prop.payload})
+	_, err = writer.Write([]byte{prop.value})
 	if err != nil {
 		return fmt.Errorf("failed to write byte property. failed to write payload: %v", err)
 	}
@@ -27,7 +27,7 @@ func (prop Int32Prop) Write(writer io.Writer) error {
 		return fmt.Errorf("failed to write four byte property. failed to write identifier '%d': %v", prop.PropId(), err)
 	}
 
-	err = types.WriteUInt32(writer, prop.payload)
+	err = types.WriteUInt32(writer, prop.value)
 	if err != nil {
 		return fmt.Errorf("failed to write four byte property. failed to write payload: %v", err)
 	}
@@ -41,7 +41,7 @@ func (prop Int16Prop) Write(writer io.Writer) error {
 		return fmt.Errorf("failed to write two byte property. failed to write identifier '%d': %v", prop.PropId(), err)
 	}
 
-	err = types.WriteUInt16(writer, prop.payload)
+	err = types.WriteUInt16(writer, prop.value)
 	if err != nil {
 		return fmt.Errorf("failed to write two byte property. failed to write payload: %v", err)
 	}
@@ -55,7 +55,7 @@ func (prop StringProp) Write(writer io.Writer) error {
 		return fmt.Errorf("failed to write utf8 string property. failed to write identifier '%d': %v", prop.PropId(), err)
 	}
 
-	err = types.WriteString(writer, prop.payload)
+	err = types.WriteString(writer, prop.value)
 	if err != nil {
 		return fmt.Errorf("failed to write utf8 string property. failed to write payload: %v", err)
 	}
@@ -69,7 +69,7 @@ func (prop KeyValueProp) Write(writer io.Writer) error {
 		return fmt.Errorf("failed to write string pair property. failed to write identifier '%d': %v", prop.PropId(), err)
 	}
 
-	err = types.WriteStringPair(writer, prop.payload)
+	err = types.WriteStringPair(writer, prop.value)
 	if err != nil {
 		return fmt.Errorf("failed to write string pair property. failed to write payload: %v", err)
 	}
@@ -83,7 +83,7 @@ func (prop VarIntProp) Write(writer io.Writer) error {
 		return fmt.Errorf("failed to write variable length integer property. failed to write identifier '%d': %v", prop.PropId(), err)
 	}
 
-	err = types.WriteVarInt(writer, prop.payload)
+	err = types.WriteVarInt(writer, prop.value)
 	if err != nil {
 		return fmt.Errorf("failed to write variable length integer property. failed to write payload: %v", err)
 	}
@@ -97,7 +97,7 @@ func (prop BinaryProp) Write(writer io.Writer) error {
 		return fmt.Errorf("failed to write binary property. failed to write identifier '%d': %v", prop.PropId(), err)
 	}
 
-	err = types.WriteBinary(writer, prop.payload)
+	err = types.WriteBinary(writer, prop.value)
 	if err != nil {
 		return fmt.Errorf("failed to write binary property. failed to write payload: %v", err)
 	}

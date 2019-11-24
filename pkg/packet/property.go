@@ -20,37 +20,37 @@ type property struct {
 
 type ByteProp struct {
 	property
-	payload byte
+	value byte
 }
 
 type Int32Prop struct {
 	property
-	payload uint32
+	value uint32
 }
 
 type Int16Prop struct {
 	property
-	payload uint16
+	value uint16
 }
 
 type StringProp struct {
 	property
-	payload string
+	value string
 }
 
 type KeyValueProp struct {
 	property
-	payload types.StringPair
+	value types.StringPair
 }
 
 type VarIntProp struct {
 	property
-	payload uint32
+	value uint32
 }
 
 type BinaryProp struct {
 	property
-	payload []byte
+	value []byte
 }
 
 const (
@@ -88,31 +88,59 @@ func (p property) PropId() PropId {
 }
 
 func NewByteProp(id PropId, val byte) ByteProp {
-	return ByteProp{property: property{id}, payload: val}
+	return ByteProp{property: property{id}, value: val}
 }
 
 func NewInt32Prop(id PropId, val uint32) Int32Prop {
-	return Int32Prop{property: property{id}, payload: val}
+	return Int32Prop{property: property{id}, value: val}
 }
 
 func NewInt16Prop(id PropId, val uint16) Int16Prop {
-	return Int16Prop{property: property{id}, payload: val}
+	return Int16Prop{property: property{id}, value: val}
 }
 
 func NewStringProp(id PropId, val string) StringProp {
-	return StringProp{property: property{id}, payload: val}
+	return StringProp{property: property{id}, value: val}
 }
 
 func NewKeyValueProp(id PropId, key string, value string) KeyValueProp {
-	return KeyValueProp{property: property{id}, payload: types.NewStringPair(key, value)}
+	return KeyValueProp{property: property{id}, value: types.NewStringPair(key, value)}
 }
 
 func NewVarIntProp(id PropId, val uint32) VarIntProp {
-	return VarIntProp{property: property{id}, payload: val}
+	return VarIntProp{property: property{id}, value: val}
 }
 
 func NewBinaryProp(id PropId, val []byte) BinaryProp {
-	return BinaryProp{property: property{id}, payload: val}
+	return BinaryProp{property: property{id}, value: val}
+}
+
+func (b BinaryProp) Value() []byte {
+	return b.value
+}
+
+func (k KeyValueProp) Value() types.StringPair {
+	return k.value
+}
+
+func (s StringProp) Value() string {
+	return s.value
+}
+
+func (n VarIntProp) Value() uint32 {
+	return n.value
+}
+
+func (n Int16Prop) Value() uint16 {
+	return n.value
+}
+
+func (n Int32Prop) Value() uint32 {
+	return n.value
+}
+
+func (b ByteProp) Value() byte {
+	return b.value
 }
 
 func BuildProps(props ...Property) map[PropId][]Property {
@@ -141,19 +169,19 @@ func (p Int16Prop) size() uint32 {
 }
 
 func (p StringProp) size() uint32 {
-	return 1 + uint32(2+len(p.payload))
+	return 1 + uint32(2+len(p.value))
 }
 
 func (p KeyValueProp) size() uint32 {
-	return 1 + uint32(2+len(p.payload.Key())+2+len(p.payload.Value()))
+	return 1 + uint32(2+len(p.value.Key())+2+len(p.value.Value()))
 }
 
 func (p VarIntProp) size() uint32 {
-	return 1 + types.VarIntSize(p.payload)
+	return 1 + types.VarIntSize(p.value)
 }
 
 func (p BinaryProp) size() uint32 {
-	return 1 + uint32(len(p.payload)+len(p.payload))
+	return 1 + uint32(len(p.value)+len(p.value))
 }
 
 func propertiesSize(props map[PropId][]Property) uint32 {
