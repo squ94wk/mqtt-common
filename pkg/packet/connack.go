@@ -13,6 +13,14 @@ type Connack struct {
 	props          map[PropId][]Property
 }
 
+func NewConnack(sessionPresent bool, connectReason ConnectReason, props map[PropId][]Property) Connack {
+	return Connack{
+		sessionPresent: sessionPresent,
+		connectReason:  connectReason,
+		props:          props,
+	}
+}
+
 func (c Connack) SessionPresent() bool {
 	return c.sessionPresent
 }
