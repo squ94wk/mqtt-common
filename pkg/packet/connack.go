@@ -60,7 +60,7 @@ func (c *Connack) ResetProps() {
 	c.props = make(map[PropId][]Property)
 }
 
-func (c Connack) Write(writer io.Writer) error {
+func (c Connack) WriteTo(writer io.Writer) error {
 	// 3.2.1 Fixed header
 	firstByte := byte(CONNACK) << 4
 	if _, err := writer.Write([]byte{firstByte}); err != nil {

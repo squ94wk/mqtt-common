@@ -34,7 +34,7 @@ const (
 )
 
 type Packet interface {
-	Write(io.Writer) error
+	WriteTo(io.Writer) error
 }
 
 func ReadPacket(reader io.Reader) (Packet, error) {

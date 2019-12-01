@@ -103,8 +103,8 @@ func TestWriteConnect(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			if err := tt.pkt.Write(writer); (err != nil) != tt.wantErr {
-				t.Errorf("pkt.Write() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.pkt.WriteTo(writer); (err != nil) != tt.wantErr {
+				t.Errorf("pkt.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			gotWriter := writer.Bytes()

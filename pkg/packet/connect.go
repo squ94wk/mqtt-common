@@ -169,7 +169,7 @@ func (p *ConnectPayload) SetWillRetain(willRetain bool) {
 	p.willRetain = willRetain
 }
 
-func (c Connect) Write(writer io.Writer) error {
+func (c Connect) WriteTo(writer io.Writer) error {
 	// 3.1.1 Fixed header
 	firstHeaderByte := byte(CONNECT) << 4
 	if _, err := writer.Write([]byte{firstHeaderByte}); err != nil {

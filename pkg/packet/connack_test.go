@@ -63,7 +63,7 @@ func TestReadConnack(t *testing.T) {
 	}
 }
 
-func TestConnackWrite(t *testing.T) {
+func TestConnackWriteTo(t *testing.T) {
 	tests := []struct {
 		name       string
 		connack    Connack
@@ -86,10 +86,10 @@ func TestConnackWrite(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			err := tt.connack.Write(writer)
+			err := tt.connack.WriteTo(writer)
 			if err != nil {
 				if !tt.wantErr {
-					t.Errorf("pkt.Write() error = %v, wantErr %v", err, tt.wantErr)
+					t.Errorf("pkt.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
 				}
 				return
 			}
