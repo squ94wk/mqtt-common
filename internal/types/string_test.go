@@ -51,12 +51,12 @@ func TestWriteString(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			if err := WriteString(writer, tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("WriteString() error = %v, wantErr %v", err, tt.wantErr)
+			if _, err := WriteStringTo(writer, tt.args.value); (err != nil) != tt.wantErr {
+				t.Errorf("WriteStringTo() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotWriter := writer.Bytes(); !bytes.Equal(gotWriter, tt.want) {
-				t.Errorf("WriteString() = %v, want %v", gotWriter, tt.want)
+				t.Errorf("WriteStringTo() = %v, want %v", gotWriter, tt.want)
 			}
 		})
 	}

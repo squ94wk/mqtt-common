@@ -23,12 +23,12 @@ func TestWriteUInt16(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := WriteUInt16(&tt.args.writer, tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("WriteUInt16() error = %v, wantErr %v", err, tt.wantErr)
+			if _, err := WriteUInt16To(&tt.args.writer, tt.args.value); (err != nil) != tt.wantErr {
+				t.Errorf("WriteUInt16To() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotWriter := tt.args.writer.Bytes(); !bytes.Equal(gotWriter, tt.want) {
-				t.Errorf("WriteUInt16() = %v, want %v", gotWriter, tt.want)
+				t.Errorf("WriteUInt16To() = %v, want %v", gotWriter, tt.want)
 			}
 		})
 	}

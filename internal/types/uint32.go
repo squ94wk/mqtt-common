@@ -5,7 +5,8 @@ import (
 	"io"
 )
 
-func WriteUInt32(writer io.Writer, value uint32) error {
+//WriteUInt32To writes a 32 bit integer to writer.
+func WriteUInt32To(writer io.Writer, value uint32) (int64, error) {
 	encoded := []byte{
 		byte(value >> 24),
 		byte(value >> 16),
@@ -13,13 +14,14 @@ func WriteUInt32(writer io.Writer, value uint32) error {
 		byte(value),
 	}
 
-	_, err := writer.Write(encoded)
+	n, err := writer.Write(encoded)
 	if err != nil {
-		return fmt.Errorf("failed to write uint32: %v", err)
+		return int64(n), fmt.Errorf("failed to write uint32: %v", err)
 	}
-	return nil
+	return 4, nil
 }
 
+//ReadUInt32 reads a 32 bit integer from reader.
 func ReadUInt32(reader io.Reader) (uint32, error) {
 	var buf [4]byte
 	_, err := io.ReadFull(reader, buf[:])

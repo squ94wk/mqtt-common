@@ -24,12 +24,12 @@ func TestWriteUInt32(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := WriteUInt32(&tt.args.writer, tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("WriteUInt32() error = %v, wantErr %v", err, tt.wantErr)
+			if _, err := WriteUInt32To(&tt.args.writer, tt.args.value); (err != nil) != tt.wantErr {
+				t.Errorf("WriteUInt32To() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotWriter := tt.args.writer.Bytes(); !bytes.Equal(gotWriter, tt.want) {
-				t.Errorf("WriteUInt32() = %v, want %v", gotWriter, tt.want)
+				t.Errorf("WriteUInt32To() = %v, want %v", gotWriter, tt.want)
 			}
 		})
 	}

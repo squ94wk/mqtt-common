@@ -86,7 +86,7 @@ func TestConnackWriteTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			err := tt.connack.WriteTo(writer)
+			_, err := tt.connack.WriteTo(writer)
 			if err != nil {
 				if !tt.wantErr {
 					t.Errorf("pkt.WriteTo() error = %v, wantErr %v", err, tt.wantErr)

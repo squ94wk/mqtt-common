@@ -102,13 +102,11 @@ func TestWriteConnect(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			if err := tt.pkt.WriteTo(writer); (err != nil) != tt.wantErr {
+			if _, err := tt.pkt.WriteTo(writer); (err != nil) != tt.wantErr {
 				t.Errorf("pkt.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			gotWriter := writer.Bytes()
-			//fmt.Println(tt.wantWriter)
-			//fmt.Println(gotWriter)
 			if diff := help.Match(tt.wantWriter, gotWriter); diff != nil {
 				t.Error(diff)
 			}

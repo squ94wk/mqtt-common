@@ -1,7 +1,9 @@
 package packet
 
+//ConnectReason is an alias for all defined connect reason codes a connack control packet can have.
 type ConnectReason byte
 
+//Names for all defined connect reason codes a connack control packet can have.
 const (
 	Success                     ConnectReason = 0   // The Connection is accepted.
 	UnspecifiedError                          = 128 // The Server does not wish to reveal the reason for the failure, or none of the other Reason Codes apply.

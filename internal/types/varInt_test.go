@@ -29,12 +29,12 @@ func TestWriteVarInt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			writer := &bytes.Buffer{}
-			if err := WriteVarInt(writer, tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("WriteVarInt() error = %v, wantErr %v", err, tt.wantErr)
+			if _, err := WriteVarIntTo(writer, tt.args.value); (err != nil) != tt.wantErr {
+				t.Errorf("WriteVarIntTo() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotWriter := writer.Bytes(); !bytes.Equal(gotWriter, tt.wantWriter) {
-				t.Errorf("WriteVarInt() = %v, want %v", gotWriter, tt.wantWriter)
+				t.Errorf("WriteVarIntTo() = %v, want %v", gotWriter, tt.wantWriter)
 			}
 		})
 	}

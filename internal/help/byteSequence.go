@@ -6,12 +6,14 @@ import (
 	"github.com/go-test/deep"
 )
 
+//CompareMode is an alias for the different modes byteSequences can be compared.
 type CompareMode int
 
+//Compare modes
 const (
-	IN_ORDER CompareMode = iota
-	REVERSED
-	ANY_ORDER
+	InOrder CompareMode = iota
+	Reversed
+	AnyOrder
 )
 
 type segment struct {
@@ -23,6 +25,7 @@ type sequence struct {
 	mode CompareMode
 }
 
+//ByteSequence defines a sequence of segments that is compared to a byte slice.
 type ByteSequence interface {
 	Length() int
 	Bytes() []byte
@@ -30,22 +33,27 @@ type ByteSequence interface {
 	Mode() CompareMode
 }
 
+//Length returns the length of a segment in bytes.
 func (s segment) Length() int {
 	return len(s.data)
 }
 
+//Segments returns a slice of the segments in a segment.
 func (s segment) Segments() []ByteSequence {
 	return []ByteSequence{s}
 }
 
+//Bytes returns the segments concatenated as one byte slice.
 func (s segment) Bytes() []byte {
 	return s.data
 }
 
+//Mode returns the compare mode.
 func (s segment) Mode() CompareMode {
 	return s.mode
 }
 
+//Length returns the length of a sequence in bytes.
 func (s sequence) Length() int {
 	total := 0
 	for _, segment := range s.data {
@@ -54,10 +62,12 @@ func (s sequence) Length() int {
 	return total
 }
 
+//Segments returns the segments in a sequence.
 func (s sequence) Segments() []ByteSequence {
 	return s.data
 }
 
+//Bytes returns the sequence concatenated as one byte slice.
 func (s sequence) Bytes() []byte {
 	buf := make([]byte, 0, s.Length())
 	for _, seg := range s.data {
@@ -66,15 +76,12 @@ func (s sequence) Bytes() []byte {
 	return buf
 }
 
+//Mode returns the compare mode.
 func (s sequence) Mode() CompareMode {
 	return s.mode
 }
 
-type byteSequence struct {
-	segments []ByteSequence
-	mode     CompareMode
-}
-
+//Match compares a byte slice against a ByteSequence.
 func Match(seq ByteSequence, binary []byte) error {
 	if len(binary) != seq.Length() {
 		return fmt.Errorf("length wanted: %d, but got %d", len(binary), seq.Length())
@@ -88,12 +95,12 @@ func Match(seq ByteSequence, binary []byte) error {
 	}
 
 	offset := 0
-	if seq.Mode() == ANY_ORDER {
+	if seq.Mode() == AnyOrder {
 		for i, seg := range seq.Segments() {
 			if Match(seg, binary[:seg.Length()]) == nil {
 				rest := append(seq.Segments()[:i], seq.Segments()[i+1:]...)
 
-				if Match(NewByteSequence(ANY_ORDER, rest...), binary[seg.Length():]) == nil {
+				if Match(NewByteSequence(AnyOrder, rest...), binary[seg.Length():]) == nil {
 					return nil
 				}
 			}
@@ -105,14 +112,14 @@ func Match(seq ByteSequence, binary []byte) error {
 	for _, p := range seq.Segments() {
 		var next []byte
 		switch seq.Mode() {
-		case IN_ORDER:
+		case InOrder:
 			next = binary[offset : offset+p.Length()]
 			offset += p.Length()
-		case REVERSED:
+		case Reversed:
 			next = binary[len(binary)-offset-p.Length() : len(binary)-offset]
 			offset += p.Length()
 		default:
-			panic("only modes 'IN_ORDER' , 'REVERSED' are currently supported")
+			panic("only modes 'IN_ORDER' , 'Reversed' are currently supported")
 		}
 		if diff := Match(p, next); diff != nil {
 			return fmt.Errorf("match failed: %d matching: %v, sequence doesn't match bytes: %v", len(successes), successes, diff)
@@ -124,14 +131,17 @@ func Match(seq ByteSequence, binary []byte) error {
 	return nil
 }
 
+//NewByteSequence is a constructor for a ByteSequence concatenating a number of ByteSequences.
 func NewByteSequence(mode CompareMode, segments ...ByteSequence) ByteSequence {
 	return sequence{mode: mode, data: segments}
 }
 
+//NewByteSegment is a constructor for a ByteSequence concatenating a number of ByteSegments.
 func NewByteSegment(segs ...[]byte) ByteSequence {
-	return segment{data: Concat(segs...), mode: IN_ORDER}
+	return segment{data: Concat(segs...), mode: InOrder}
 }
 
+//Concat is an auxiliary function to concatenate byte slices.
 func Concat(arrays ...[]byte) []byte {
 	length := 0
 	for _, a := range arrays {

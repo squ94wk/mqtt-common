@@ -6,22 +6,24 @@ import (
 )
 
 const (
-	b0111_1111 = 1<<7 - 1
-	b1000_0000 = 1 << 7
+	b01111111 = 1<<7 - 1
+	b10000000 = 1 << 7
 )
 
-func WriteVarInt(writer io.Writer, value uint32) error {
+//WriteVarIntTo writes an encoded variable length integer to writer.
+func WriteVarIntTo(writer io.Writer, value uint32) (int64, error) {
 	var buf [4]byte
 	encoded := encodeVarInt(value, buf)
 
-	_, err := writer.Write(encoded)
+	n, err := writer.Write(encoded)
 	if err != nil {
-		return fmt.Errorf("couldn't write varInt '%d': %v", value, err)
+		return int64(n), fmt.Errorf("couldn't write varInt '%d': %v", value, err)
 	}
 
-	return nil
+	return 4, nil
 }
 
+//ReadVarInt reads an encoded variable length integer from reader.
 func ReadVarInt(reader io.Reader) (uint32, error) {
 	var offset, value uint32 = 0, 0
 	var buf [1]byte
@@ -31,10 +33,10 @@ func ReadVarInt(reader io.Reader) (uint32, error) {
 			return 0, fmt.Errorf("failed to read byte (current value: %d): %v", value, err)
 		}
 
-		value += uint32(buf[0]&b0111_1111) << offset
+		value += uint32(buf[0]&b01111111) << offset
 
 		offset += 7
-		if (buf[0] & b1000_0000) == 0 {
+		if (buf[0] & b10000000) == 0 {
 			return value, nil
 		}
 	}

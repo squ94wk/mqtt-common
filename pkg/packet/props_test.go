@@ -9,13 +9,13 @@ import (
 	"github.com/squ94wk/mqtt-common/internal/help"
 )
 
-func NewProps(props ...Property) map[PropId][]Property {
-	properties := make(map[PropId][]Property)
+func NewProps(props ...Property) map[PropID][]Property {
+	properties := make(map[PropID][]Property)
 	for _, p := range props {
-		if withId, ok := properties[p.PropId()]; ok {
-			properties[p.PropId()] = append(withId, p)
+		if withID, ok := properties[p.PropID()]; ok {
+			properties[p.PropID()] = append(withID, p)
 		} else {
-			properties[p.PropId()] = []Property{p}
+			properties[p.PropID()] = []Property{p}
 		}
 	}
 
@@ -29,7 +29,7 @@ func TestReadProperties(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    map[PropId][]Property
+		want    map[PropID][]Property
 		wantErr bool
 	}{
 		{
@@ -50,8 +50,8 @@ func TestReadProperties(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := make(map[PropId][]Property)
-			err := readProperties(tt.args.reader, got)
+			got := make(map[PropID][]Property)
+			err := readProps(tt.args.reader, got)
 			if err != nil {
 				if !tt.wantErr {
 					t.Errorf("ReadProperties() error = %v, wantErr %v", err, tt.wantErr)
@@ -64,3 +64,5 @@ func TestReadProperties(t *testing.T) {
 		})
 	}
 }
+
+//TODO: TestWritePropsTo

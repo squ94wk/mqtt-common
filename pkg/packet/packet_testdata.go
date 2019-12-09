@@ -14,7 +14,7 @@ var (
 	)
 
 	connect2Bin = help.NewByteSequence(
-		help.IN_ORDER,
+		help.InOrder,
 		help.NewByteSegment(
 			[]byte{byte(CONNECT) << 4, 46},
 			[]byte{0, 4, 'M', 'Q', 'T', 'T', 5},
@@ -22,7 +22,7 @@ var (
 			[]byte{0, 100},
 			[]byte{33}),
 		help.NewByteSequence(
-			help.ANY_ORDER,
+			help.AnyOrder,
 			help.NewByteSegment([]byte{byte(SessionExpiryInterval), 0, 0, 0, 100}),
 			help.NewByteSegment([]byte{byte(UserProperty), 0, 3, 'k', 'e', 'y', 0, 5, 'v', 'a', 'l', 'u', 'e'}),
 			help.NewByteSegment([]byte{byte(UserProperty), 0, 4, 'k', 'e', 'y', '2', 0, 6, 'v', 'a', 'l', 'u', 'e', '2'}),
@@ -33,7 +33,7 @@ var (
 	)
 
 	connect3Bin = help.NewByteSequence(
-		help.IN_ORDER,
+		help.InOrder,
 		help.NewByteSegment(
 			//fixed header
 			[]byte{byte(CONNECT) << 4, 46},
@@ -47,7 +47,7 @@ var (
 			[]byte{33},
 		),
 		help.NewByteSequence(
-			help.ANY_ORDER,
+			help.AnyOrder,
 			// //session expiry interval
 			help.NewByteSegment([]byte{byte(SessionExpiryInterval), 0, 0, 0, 100}),
 			// //user properties
@@ -55,13 +55,13 @@ var (
 			help.NewByteSegment([]byte{byte(UserProperty), 0, 4, 'k', 'e', 'y', '2', 0, 6, 'v', 'a', 'l', 'u', 'e', '2'}),
 		),
 		help.NewByteSegment(
-			//clientId
+			//clientID
 			[]byte{0, 0},
 		),
 	)
 
 	connect4Bin = help.NewByteSequence(
-		help.IN_ORDER,
+		help.InOrder,
 		help.NewByteSegment(
 			[]byte{byte(CONNECT) << 4, 113},
 			//fixed header
@@ -75,7 +75,7 @@ var (
 			[]byte{33},
 		),
 		help.NewByteSequence(
-			help.ANY_ORDER,
+			help.AnyOrder,
 			// //session expiry interval
 			help.NewByteSegment([]byte{byte(SessionExpiryInterval), 0, 0, 0, 100}),
 			// //user properties
@@ -83,8 +83,8 @@ var (
 			help.NewByteSegment([]byte{byte(UserProperty), 0, 4, 'k', 'e', 'y', '2', 0, 6, 'v', 'a', 'l', 'u', 'e', '2'}),
 		),
 		help.NewByteSegment(
-			//clientId
-			[]byte{0, 8, 'c', 'l', 'i', 'e', 'n', 't', 'I', 'd'},
+			//clientID
+			[]byte{0, 8, 'c', 'l', 'i', 'e', 'n', 't', 'I', 'D'},
 			//will properties
 			// //len
 			[]byte{21},
@@ -102,7 +102,7 @@ var (
 	)
 
 	connect5Bin = help.NewByteSequence(
-		help.IN_ORDER,
+		help.InOrder,
 		help.NewByteSegment(
 			[]byte{byte(CONNECT) << 4, 18},
 			//fixed header
@@ -113,7 +113,7 @@ var (
 			[]byte{0, 10},
 			//properties (len + session expiry interval)
 			[]byte{5, byte(SessionExpiryInterval), 0, 0, 0, 10},
-			//clientId
+			//clientID
 			[]byte{0, 0},
 		),
 	)
@@ -178,7 +178,7 @@ var (
 			NewKeyValueProp(UserProperty, "key", "value"),
 			NewKeyValueProp(UserProperty, "key2", "value2"),
 		),
-		"clientId",
+		"clientID",
 		true,
 		Qos2,
 		BuildProps(
@@ -207,7 +207,7 @@ var (
 	)
 
 	connack1Bin = help.NewByteSequence(
-		help.IN_ORDER,
+		help.InOrder,
 		help.NewByteSegment(
 			[]byte{byte(CONNACK) << 4, 17},
 			//variable header
@@ -217,14 +217,14 @@ var (
 		),
 		//props
 		help.NewByteSequence(
-			help.ANY_ORDER,
+			help.AnyOrder,
 			help.NewByteSegment([]byte{byte(AssignedClientIdentifier), 0, 6, 'c', 'l', 'i', 'e', 'n', 't'}),
 			help.NewByteSegment([]byte{byte(MaximumPacketSize), 0, 1, 0, 0}),
 		),
 	)
 
 	connack2Bin = help.NewByteSequence(
-		help.IN_ORDER,
+		help.InOrder,
 		help.NewByteSegment(
 			[]byte{byte(CONNACK) << 4, 14},
 			//variable header
@@ -234,7 +234,7 @@ var (
 		),
 		//props
 		help.NewByteSequence(
-			help.ANY_ORDER,
+			help.AnyOrder,
 			help.NewByteSegment([]byte{byte(AssignedClientIdentifier), 0, 6, 'c', 'l', 'i', 'e', 'n', 't'}),
 			help.NewByteSegment([]byte{byte(MaximumQoS), 1}),
 		),

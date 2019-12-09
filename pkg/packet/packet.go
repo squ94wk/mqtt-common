@@ -7,14 +7,20 @@ import (
 
 type pktType byte
 
+//QoS is an alias for the three quality of service levels.
 type QoS byte
 
+//The three quality of service levels.
 const (
+	//QoS 0 = At most once delivery
 	Qos0 = QoS(0)
+	//QoS 1 = At least once delivery
 	Qos1 = QoS(1)
+	//QoS 2 = Exactly once delivery
 	Qos2 = QoS(2)
 )
 
+//Constants for all control packet types
 const (
 	CONNECT pktType = iota + 1
 	CONNACK
@@ -33,10 +39,13 @@ const (
 	AUTH
 )
 
+//Packet defines a control packet.
 type Packet interface {
-	WriteTo(io.Writer) error
+	WriteTo(io.Writer) (int64, error)
 }
 
+//ReadPacket reads a packet from reader.
+//If the packet is malformec or contains a protocol error, an error is returned.
 func ReadPacket(reader io.Reader) (Packet, error) {
 	var header header
 	if err := readHeader(reader, &header); err != nil {
@@ -58,7 +67,8 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connect packet: invalid flags '%d'", header.flags)
 		}
 		var connect Connect
-		err := readConnect(reader, &connect, header)
+		limitReader := io.LimitReader(reader, int64(header.length))
+		err := readConnect(limitReader, &connect)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read Connect packet: %v", err)
 		}
