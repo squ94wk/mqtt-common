@@ -11,11 +11,11 @@ import (
 type Connack struct {
 	sessionPresent bool
 	connectReason  ConnectReason
-	props          map[PropID][]Property
+	props          Properties
 }
 
 //NewConnack is the constructor for the Connack type.
-func NewConnack(sessionPresent bool, connectReason ConnectReason, props map[PropID][]Property) Connack {
+func NewConnack(sessionPresent bool, connectReason ConnectReason, props Properties) Connack {
 	return Connack{
 		sessionPresent: sessionPresent,
 		connectReason:  connectReason,
@@ -44,31 +44,13 @@ func (c *Connack) SetConnectReason(reason ConnectReason) {
 }
 
 //Props returns the properties of the connack control packet.
-func (c Connack) Props() map[PropID][]Property {
+func (c Connack) Props() Properties {
 	return c.props
 }
 
 //SetProps replaces the properties of the connack control packet.
-func (c *Connack) SetProps(props map[PropID][]Property) {
+func (c *Connack) SetProps(props map[uint32][]Property) {
 	c.props = props
-}
-
-//AddProp adds a property to the properties of the connack control packet.
-//If the packet already contains any properties with the same property identifier it is appended the the existing ones.
-//It also makes no assumptions as to if the mqtt protocol allows multiple properties of that identifier.
-func (c *Connack) AddProp(prop Property) {
-	propID := prop.PropID()
-	properties, ok := c.props[propID]
-	if !ok {
-		c.props[propID] = []Property{prop}
-	} else {
-		c.props[propID] = append(properties, prop)
-	}
-}
-
-//ResetProps removes all properties from the connack control packet
-func (c *Connack) ResetProps() {
-	c.props = make(map[PropID][]Property)
 }
 
 //WriteTo writes the connack control packet to writer according to the mqtt protocol.
@@ -84,9 +66,9 @@ func (c Connack) WriteTo(writer io.Writer) (int64, error) {
 
 	//3.2.2 Variable header
 	var remainingLength uint32 = 1 + 1         // flags = session present, connect reason
-	remainingLength += propertiesSize(c.props) // size of varInt of the props length
+	remainingLength += c.props.size()
 	// no payload
-	n2, err := types.WriteVarIntTo(writer, uint32(remainingLength))
+	n2, err := types.WriteVarIntTo(writer, remainingLength)
 	n += n2
 	if err != nil {
 		return n, fmt.Errorf("failed to write connack packet: failed to write packet length: %v", err)
@@ -111,7 +93,9 @@ func (c Connack) WriteTo(writer io.Writer) (int64, error) {
 		return n, fmt.Errorf("failed to write connack packet: failed to write connect reason: %v", err)
 	}
 
-	if _, err := WritePropsTo(writer, c.props); err != nil {
+	n5, err := c.props.WriteTo(writer)
+	n += n5
+	if err != nil {
 		return n, fmt.Errorf("failed to write connack packet: failed to write properties: %v", err)
 	}
 
@@ -140,11 +124,11 @@ func readConnack(reader io.Reader, connack *Connack, header header) error {
 	//TODO: check for allowed values
 
 	// 3.2.2.3 Connack properties
-	connack.ResetProps()
-	err = readProps(limitReader, connack.props)
+	props, err := readProperties(limitReader)
 	if err != nil {
 		return fmt.Errorf("failed to read connack packet: failed to read properties: %v", err)
 	}
+	connack.props = props
 
 	return nil
 }

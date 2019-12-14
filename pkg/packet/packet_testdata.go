@@ -2,7 +2,6 @@ package packet
 
 import (
 	"github.com/squ94wk/mqtt-common/internal/help"
-	"github.com/squ94wk/mqtt-common/pkg/topic"
 )
 
 var (
@@ -70,8 +69,7 @@ var (
 			[]byte{244},
 			//keep alive
 			[]byte{0, 100},
-			//properties
-			// //len
+			//properties length
 			[]byte{33},
 		),
 		help.NewByteSequence(
@@ -85,8 +83,7 @@ var (
 		help.NewByteSegment(
 			//clientID
 			[]byte{0, 8, 'c', 'l', 'i', 'e', 'n', 't', 'I', 'D'},
-			//will properties
-			// //len
+			//will properties length
 			[]byte{21},
 			// //user prop
 			[]byte{byte(UserProperty), 0, 7, 'w', 'i', 'l', 'l', 'K', 'e', 'y', 0, 9, 'w', 'i', 'l', 'l', 'V', 'a', 'l', 'u', 'e'},
@@ -121,8 +118,8 @@ var (
 	connect1 = NewConnect(
 		true,
 		10,
-		BuildProps(
-			NewInt32Prop(SessionExpiryInterval, 10),
+		NewProperties(
+			Property{propID: SessionExpiryInterval, payload:Int32PropPayload(10)},
 		),
 		"",
 		false,
@@ -137,10 +134,10 @@ var (
 	connect2 = NewConnect(
 		true,
 		100,
-		BuildProps(
-			NewInt32Prop(SessionExpiryInterval, 100),
-			NewKeyValueProp(UserProperty, "key", "value"),
-			NewKeyValueProp(UserProperty, "key2", "value2"),
+		NewProperties(
+			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(100)},
+			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
 		"",
 		false,
@@ -155,10 +152,10 @@ var (
 	connect3 = NewConnect(
 		true,
 		100,
-		BuildProps(
-			NewInt32Prop(SessionExpiryInterval, 100),
-			NewKeyValueProp(UserProperty, "key", "value"),
-			NewKeyValueProp(UserProperty, "key2", "value2"),
+		NewProperties(
+			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(100)},
+			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
 		"",
 		false,
@@ -173,18 +170,18 @@ var (
 	connect4 = NewConnect(
 		false,
 		100,
-		BuildProps(
-			NewInt32Prop(SessionExpiryInterval, 100),
-			NewKeyValueProp(UserProperty, "key", "value"),
-			NewKeyValueProp(UserProperty, "key2", "value2"),
+		NewProperties(
+			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(100)},
+			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
 		"clientID",
 		true,
 		Qos2,
-		BuildProps(
-			NewKeyValueProp(UserProperty, "willKey", "willValue"),
+		NewProperties(
+			Property{propID:UserProperty, payload: NewKeyValuePropPayload("willKey", "willValue")},
 		),
-		topic.Topic("/will/topic"),
+		"/will/topic",
 		[]byte("willPayload"),
 		"user",
 		[]byte("pwd"),
@@ -193,8 +190,8 @@ var (
 	connect5 = NewConnect(
 		true,
 		10,
-		BuildProps(
-			NewInt32Prop(SessionExpiryInterval, 10),
+		NewProperties(
+			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(10)},
 		),
 		"",
 		false,
@@ -243,18 +240,18 @@ var (
 	connack1 = Connack{
 		connectReason:  Success,
 		sessionPresent: true,
-		props: BuildProps(
-			NewStringProp(AssignedClientIdentifier, "client"),
-			NewInt32Prop(MaximumPacketSize, 1<<16),
+		props: NewProperties(
+			Property{propID:AssignedClientIdentifier, payload: StringPropPayload("client")},
+			Property{propID:MaximumPacketSize, payload: Int32PropPayload(1<<16)},
 		),
 	}
 
 	connack2 = Connack{
 		connectReason:  Success,
 		sessionPresent: false,
-		props: BuildProps(
-			NewStringProp(AssignedClientIdentifier, "client"),
-			NewByteProp(MaximumQoS, byte(Qos1)),
+		props: NewProperties(
+			Property{propID:AssignedClientIdentifier, payload: StringPropPayload("client")},
+			Property{propID:MaximumQoS, payload: BytePropPayload(Qos1)},
 		),
 	}
 )

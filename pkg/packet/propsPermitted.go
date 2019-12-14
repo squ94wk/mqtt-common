@@ -1,7 +1,7 @@
 package packet
 
 var (
-	allowedProps map[uint8]map[PropID]int
+	allowedProps map[uint8]map[uint32]int
 )
 
 type entry struct {
@@ -27,7 +27,7 @@ func init() {
 		Will
 	)
 
-	allowedProps = make(map[uint8]map[PropID]int)
+	allowedProps = make(map[uint8]map[uint32]int)
 
 	// 2.2.2.2
 	compatible(PayloadFormatIndicator, entry{Publish, 1}, entry{Will, 1})
@@ -58,11 +58,11 @@ func init() {
 	compatible(SharedSubscriptionAvailable, entry{Connack, 1})
 }
 
-func compatible(id PropID, entries ...entry) {
+func compatible(id uint32, entries ...entry) {
 	for _, entry := range entries {
 		_, ok := allowedProps[entry.part]
 		if !ok {
-			allowedProps[entry.part] = make(map[PropID]int)
+			allowedProps[entry.part] = make(map[uint32]int)
 		}
 
 		allowedProps[entry.part][id] = entry.times
@@ -70,7 +70,7 @@ func compatible(id PropID, entries ...entry) {
 }
 
 //Allowed returns the number of times a property with identifier id may be used in a part.
-func Allowed(part uint8, id PropID) int {
+func Allowed(part uint8, id uint32) int {
 	times, ok := allowedProps[part]
 	if !ok {
 		return 0

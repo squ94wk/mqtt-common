@@ -9,19 +9,6 @@ import (
 	"github.com/squ94wk/mqtt-common/internal/help"
 )
 
-func NewProps(props ...Property) map[PropID][]Property {
-	properties := make(map[PropID][]Property)
-	for _, p := range props {
-		if withID, ok := properties[p.PropID()]; ok {
-			properties[p.PropID()] = append(withID, p)
-		} else {
-			properties[p.PropID()] = []Property{p}
-		}
-	}
-
-	return properties
-}
-
 func TestReadProperties(t *testing.T) {
 	type args struct {
 		reader io.Reader
@@ -29,7 +16,7 @@ func TestReadProperties(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    map[PropID][]Property
+		want    Properties
 		wantErr bool
 	}{
 		{
@@ -41,17 +28,16 @@ func TestReadProperties(t *testing.T) {
 					[]byte{byte(AssignedClientIdentifier), 0, 6, 'c', 'l', 'i', 'e', 'n', 't'},
 				)),
 			},
-			want: NewProps(
-				NewInt32Prop(SessionExpiryInterval, 10),
-				NewStringProp(AssignedClientIdentifier, "client"),
+			want: NewProperties(
+				Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
+				Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
 			),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := make(map[PropID][]Property)
-			err := readProps(tt.args.reader, got)
+			got, err := readProperties(tt.args.reader)
 			if err != nil {
 				if !tt.wantErr {
 					t.Errorf("ReadProperties() error = %v, wantErr %v", err, tt.wantErr)

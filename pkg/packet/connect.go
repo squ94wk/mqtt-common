@@ -13,14 +13,14 @@ import (
 type Connect struct {
 	keepAlive  uint16
 	cleanStart bool
-	props      map[PropID][]Property
+	props      Properties
 	payload    ConnectPayload
 }
 
 //ConnectPayload defines the payload of a connect control packet.
 type ConnectPayload struct {
 	clientID    string
-	willProps   map[PropID][]Property
+	willProps   Properties
 	willRetain  bool
 	willQoS     QoS
 	willTopic   topic.Topic
@@ -33,11 +33,11 @@ type ConnectPayload struct {
 func NewConnect(
 	cleanStart bool,
 	keepAlive uint16,
-	props map[PropID][]Property,
+	props Properties,
 	clientID string,
 	willRetain bool,
 	willQoS QoS,
-	willProps map[PropID][]Property,
+	willProps Properties,
 	willTopic topic.Topic,
 	willPayload []byte,
 	username string,
@@ -80,31 +80,13 @@ func (c *Connect) SetCleanStart(cleanStart bool) {
 }
 
 //Props returns the properties of the connect control packet.
-func (c Connect) Props() map[PropID][]Property {
+func (c Connect) Props() Properties {
 	return c.props
 }
 
 //SetProps replaces the properties of the connect control packet.
-func (c *Connect) SetProps(props map[PropID][]Property) {
+func (c *Connect) SetProps(props Properties) {
 	c.props = props
-}
-
-//AddProp adds a property to the properties of the connect control packet.
-//If the packet already contains any properties with the same property identifier it is appended the the existing ones.
-//It also makes no assumptions as to if the mqtt protocol allows multiple properties of that identifier.
-func (c *Connect) AddProp(prop Property) {
-	propID := prop.PropID()
-	properties, ok := c.props[propID]
-	if !ok {
-		c.props[propID] = []Property{prop}
-	} else {
-		c.props[propID] = append(properties, prop)
-	}
-}
-
-//ResetProps removes all properties from the connect control packet.
-func (c *Connect) ResetProps() {
-	c.props = make(map[PropID][]Property)
 }
 
 //Payload returns the payload of the connect control packet.
@@ -123,31 +105,13 @@ func (p *ConnectPayload) SetClientID(clientID string) {
 }
 
 //WillProps returns the properties of the will message of the connect control packet.
-func (p ConnectPayload) WillProps() map[PropID][]Property {
+func (p ConnectPayload) WillProps() Properties {
 	return p.willProps
 }
 
 //SetWillProps replaces the properties of the will message of the connect control packet.
-func (p *ConnectPayload) SetWillProps(props map[PropID][]Property) {
+func (p *ConnectPayload) SetWillProps(props Properties) {
 	p.willProps = props
-}
-
-//AddWillProp adds a property to the properties of the connect control packet.
-//If the packet already contains any properties with the same property identifier it is appended the the existing ones.
-//It also makes no assumptions as to if the mqtt protocol allows multiple properties of that identifier.
-func (p *ConnectPayload) AddWillProp(prop Property) {
-	propID := prop.PropID()
-	properties, ok := p.willProps[propID]
-	if !ok {
-		p.willProps[propID] = []Property{prop}
-	} else {
-		p.willProps[propID] = append(properties, prop)
-	}
-}
-
-//ResetWillProps removes all properties from the will message of the connect control packet.
-func (p *ConnectPayload) ResetWillProps() {
-	p.willProps = make(map[PropID][]Property)
 }
 
 //WillTopic returns the topic of the will message of the connect control packet.
@@ -245,10 +209,10 @@ func writeFixedHeader(c Connect, writer io.Writer) (int64, error) {
 
 	// Remaining length
 	var remainingLength uint32 = 7 + 1 + 2 // protocol name & version, flags, keep alive
-	remainingLength += propertiesSize(c.props)
+	remainingLength += c.props.size()
 	remainingLength += types.StringSize(c.payload.clientID)
 	if c.payload.willTopic != "" {
-		remainingLength += propertiesSize(c.payload.willProps)
+		remainingLength += c.payload.willProps.size()
 		remainingLength += types.StringSize(string(c.payload.willTopic))
 		remainingLength += types.BinarySize(c.payload.willPayload)
 	}
@@ -320,7 +284,7 @@ func writeVariableHeader(c Connect, writer io.Writer) (int64, error) {
 	}
 
 	// 3.1.2.11 Properties
-	n4, err := WritePropsTo(writer, c.props)
+	n4, err := c.props.WriteTo(writer)
 	n += n4
 	if err != nil {
 		return n, fmt.Errorf("failed to write properties: %v", err)
@@ -341,7 +305,7 @@ func writePayload(c Connect, writer io.Writer) (int64, error) {
 	// 3.1.3.2 Will properties
 	if c.payload.willTopic != "" {
 		// 3.1.3.2.1 Property length
-		n2, err := WritePropsTo(writer, c.payload.willProps)
+		n2, err := c.payload.willProps.WriteTo(writer)
 		n += n2
 		if err != nil {
 			return n, fmt.Errorf("failed to write connect packet: failed to write will properties: %v", err)
@@ -439,10 +403,11 @@ func readConnect(reader io.Reader, connect *Connect) error {
 	connect.SetKeepAlive(keepAlive)
 
 	// 3.1.2.11 Properties
-	connect.ResetProps()
-	if err := readProps(reader, connect.props); err != nil {
+	props, err := readProperties(reader)
+	if err != nil {
 		return fmt.Errorf("failed to read connect packet: failed to read will properties: %v", err)
 	}
+	connect.props = props
 
 	// 3.1.3 Payload
 	payload := ConnectPayload{}
@@ -461,12 +426,12 @@ func readConnect(reader io.Reader, connect *Connect) error {
 	if hasWill {
 		payload.SetWillQoS(willQoS)
 
-		payload.ResetWillProps()
 		// 3.1.3.2 Will properties
-		err := readProps(reader, payload.willProps)
+		willProps, err := readProperties(reader)
 		if err != nil {
 			return fmt.Errorf("failed to read connect packet: failed to read will properties: %v", err)
 		}
+		payload.willProps = willProps
 
 		// 3.1.3.3 Will topic
 		willTopic, err := types.ReadString(reader)
