@@ -20,7 +20,7 @@ func WriteVarIntTo(writer io.Writer, value uint32) (int64, error) {
 		return int64(n), fmt.Errorf("couldn't write varInt '%d': %v", value, err)
 	}
 
-	return 4, nil
+	return int64(n), nil
 }
 
 //ReadVarInt reads an encoded variable length integer from reader.
