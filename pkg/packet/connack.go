@@ -65,7 +65,7 @@ func (c Connack) WriteTo(writer io.Writer) (int64, error) {
 	}
 
 	//3.2.2 Variable header
-	var remainingLength uint32 = 1 + 1         // flags = session present, connect reason
+	var remainingLength uint32 = 1 + 1 // flags = session present, connect reason
 	remainingLength += c.props.size()
 	// no payload
 	n2, err := types.WriteVarIntTo(writer, remainingLength)

@@ -8,7 +8,7 @@ import (
 
 //Property defines a property composition.
 type Property struct {
-	propID uint32
+	propID  uint32
 	payload PropertyPayload
 }
 
@@ -154,11 +154,11 @@ func (p Int16PropPayload) size() uint32 {
 }
 
 func (p StringPropPayload) size() uint32 {
-	return uint32(2+len(p))
+	return uint32(2 + len(p))
 }
 
 func (p KeyValuePropPayload) size() uint32 {
-	return uint32(2+len(p.key)+2+len(p.value))
+	return uint32(2 + len(p.key) + 2 + len(p.value))
 }
 
 func (p VarIntPropPayload) size() uint32 {
@@ -166,7 +166,7 @@ func (p VarIntPropPayload) size() uint32 {
 }
 
 func (p BinaryPropPayload) size() uint32 {
-	return uint32(len(p)+len(p))
+	return uint32(len(p) + len(p))
 }
 
 func (p Properties) size() uint32 {

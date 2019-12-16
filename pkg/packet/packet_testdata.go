@@ -119,7 +119,7 @@ var (
 		true,
 		10,
 		NewProperties(
-			Property{propID: SessionExpiryInterval, payload:Int32PropPayload(10)},
+			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
 		),
 		"",
 		false,
@@ -135,9 +135,9 @@ var (
 		true,
 		100,
 		NewProperties(
-			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(100)},
-			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
+			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
 		"",
 		false,
@@ -153,9 +153,9 @@ var (
 		true,
 		100,
 		NewProperties(
-			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(100)},
-			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
+			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
 		"",
 		false,
@@ -171,15 +171,15 @@ var (
 		false,
 		100,
 		NewProperties(
-			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(100)},
-			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID:UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
+			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
 		"clientID",
 		true,
 		Qos2,
 		NewProperties(
-			Property{propID:UserProperty, payload: NewKeyValuePropPayload("willKey", "willValue")},
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("willKey", "willValue")},
 		),
 		"/will/topic",
 		[]byte("willPayload"),
@@ -191,7 +191,7 @@ var (
 		true,
 		10,
 		NewProperties(
-			Property{propID:SessionExpiryInterval, payload: Int32PropPayload(10)},
+			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
 		),
 		"",
 		false,
@@ -241,8 +241,8 @@ var (
 		connectReason:  Success,
 		sessionPresent: true,
 		props: NewProperties(
-			Property{propID:AssignedClientIdentifier, payload: StringPropPayload("client")},
-			Property{propID:MaximumPacketSize, payload: Int32PropPayload(1<<16)},
+			Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
+			Property{propID: MaximumPacketSize, payload: Int32PropPayload(1 << 16)},
 		),
 	}
 
@@ -250,8 +250,8 @@ var (
 		connectReason:  Success,
 		sessionPresent: false,
 		props: NewProperties(
-			Property{propID:AssignedClientIdentifier, payload: StringPropPayload("client")},
-			Property{propID:MaximumQoS, payload: BytePropPayload(Qos1)},
+			Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
+			Property{propID: MaximumQoS, payload: BytePropPayload(Qos1)},
 		),
 	}
 )
