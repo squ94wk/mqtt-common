@@ -107,6 +107,11 @@ func (p Property) PropID() uint32 {
 	return p.propID
 }
 
+//Payload returns the payload of the property.
+func (p Property) Payload() PropertyPayload {
+	return p.payload
+}
+
 //Key returns the key of the key value property.
 func (p KeyValuePropPayload) Key() string {
 	return p.key
