@@ -29,36 +29,6 @@ type ConnectPayload struct {
 	password    []byte
 }
 
-//NewConnect is the constructor for the Connect type.
-func NewConnect(
-	cleanStart bool,
-	keepAlive uint16,
-	props Properties,
-	clientID string,
-	willRetain bool,
-	willQoS QoS,
-	willProps Properties,
-	willTopic topic.Topic,
-	willPayload []byte,
-	username string,
-	password []byte) Connect {
-	return Connect{
-		keepAlive:  keepAlive,
-		cleanStart: cleanStart,
-		props:      props,
-		payload: ConnectPayload{
-			clientID:    clientID,
-			willProps:   willProps,
-			willRetain:  willRetain,
-			willQoS:     willQoS,
-			willTopic:   willTopic,
-			willPayload: willPayload,
-			username:    username,
-			password:    password,
-		},
-	}
-}
-
 //KeepAlive returns the keep alive duration of the connect control packet in seconds.
 func (c Connect) KeepAlive() uint16 {
 	return c.keepAlive

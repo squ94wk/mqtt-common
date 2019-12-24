@@ -14,15 +14,6 @@ type Connack struct {
 	props          Properties
 }
 
-//NewConnack is the constructor for the Connack type.
-func NewConnack(sessionPresent bool, connectReason ConnectReason, props Properties) Connack {
-	return Connack{
-		sessionPresent: sessionPresent,
-		connectReason:  connectReason,
-		props:          props,
-	}
-}
-
 //SessionPresent returns the value of the session present flag.
 func (c Connack) SessionPresent() bool {
 	return c.sessionPresent

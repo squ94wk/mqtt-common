@@ -115,93 +115,103 @@ var (
 		),
 	)
 
-	connect1 = NewConnect(
-		true,
-		10,
-		NewProperties(
+	connect1 = Connect{
+		keepAlive:  10,
+		cleanStart: true,
+		props:      NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
 		),
-		"",
-		false,
-		Qos0,
-		nil,
-		"",
-		nil,
-		"",
-		nil,
-	)
+		payload: ConnectPayload{
+			clientID:    "",
+			willProps:   nil,
+			willRetain:  false,
+			willQoS:     Qos0,
+			willTopic:   "",
+			willPayload: nil,
+			username:    "",
+			password:    nil,
+		},
+	}
 
-	connect2 = NewConnect(
-		true,
-		100,
-		NewProperties(
+	connect2 = Connect{
+		keepAlive:  100,
+		cleanStart: true,
+		props:      NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
-		"",
-		false,
-		Qos0,
-		nil,
-		"",
-		nil,
-		"",
-		nil,
-	)
+		payload: ConnectPayload{
+			clientID:    "",
+			willProps:   nil,
+			willRetain:  false,
+			willQoS:     Qos0,
+			willTopic:   "",
+			willPayload: nil,
+			username:    "",
+			password:    nil,
+		},
+	}
 
-	connect3 = NewConnect(
-		true,
-		100,
-		NewProperties(
+	connect3 = Connect{
+		keepAlive:  100,
+		cleanStart: true,
+		props:      NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
-		"",
-		false,
-		Qos0,
-		nil,
-		"",
-		nil,
-		"",
-		nil,
-	)
+		payload: ConnectPayload{
+			clientID:    "",
+			willProps:   nil,
+			willRetain:  false,
+			willQoS:     Qos0,
+			willTopic:   "",
+			willPayload: nil,
+			username:    "",
+			password:    nil,
+		},
+	}
 
-	connect4 = NewConnect(
-		false,
-		100,
-		NewProperties(
+	connect4 = Connect{
+		keepAlive:  100,
+		cleanStart: false,
+		props:      NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
-		"clientID",
-		true,
-		Qos2,
-		NewProperties(
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("willKey", "willValue")},
-		),
-		"/will/topic",
-		[]byte("willPayload"),
-		"user",
-		[]byte("pwd"),
-	)
+		payload: ConnectPayload{
+			clientID:    "clientID",
+			willProps:   NewProperties(
+				Property{propID: UserProperty, payload: NewKeyValuePropPayload("willKey", "willValue")},
+			),
+			willRetain:  true,
+			willQoS:     Qos2,
+			willTopic:   "/will/topic",
+			willPayload: []byte("willPayload"),
+			username:    "user",
+			password:    []byte("pwd"),
+		},
+	}
 
-	connect5 = NewConnect(
-		true,
-		10,
-		NewProperties(
+	connect5 = Connect{
+		keepAlive:  10,
+		cleanStart: true,
+		props:      NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
 		),
-		"",
-		false,
-		Qos0,
-		nil,
-		"",
-		nil,
-		"",
-		nil,
-	)
+		payload: ConnectPayload{
+			clientID:    "",
+			willProps:   nil,
+			willRetain:  false,
+			willQoS:     Qos0,
+			willTopic:   "",
+			willPayload: nil,
+			username:    "",
+			password:    nil,
+		},
+	}
 
 	connack1Bin = help.NewByteSequence(
 		help.InOrder,
