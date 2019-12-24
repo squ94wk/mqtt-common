@@ -45,7 +45,7 @@ type Packet interface {
 }
 
 //ReadPacket reads a packet from reader.
-//If the packet is malformec or contains a protocol error, an error is returned.
+//If the packet is malformed or contains a protocol error, an error is returned.
 func ReadPacket(reader io.Reader) (Packet, error) {
 	var header header
 	if err := readHeader(reader, &header); err != nil {
