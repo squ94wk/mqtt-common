@@ -23,7 +23,7 @@ func TestReadConnack(t *testing.T) {
 		{
 			name: "Invalid flags => err", args: args{
 				reader: bytes.NewReader(help.Concat(
-					[]byte{2, byte(Success)},
+					[]byte{2, byte(ConnectSuccess)},
 				)),
 			},
 			wantErr: true,

@@ -107,16 +107,15 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		panic("implement me")
 
 	case DISCONNECT:
-		//if header.Flags() != 0 {
-		//return nil, fmt.Errorf("failed to read packet: invalid fixed header of Disconnect packet: invalid flags '%d'", header.Flags())
-		//}
-		//var disconnect Disconnect
-		//err := ReadDisconnect(reader, &disconnect, header)
-		//if err != nil {
-		//return nil, fmt.Errorf("failed to read Disconnect packet: %v", err)
-		//}
-		//log.Info("read Disconnect packet")
-		//return &disconnect, nil
+		if header.flags != 0 {
+			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Disconnect packet: invalid flags '%d'", header.flags)
+		}
+		var disconnect Disconnect
+		err := readDisconnect(reader, &disconnect, header)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read disconnect packet: %v", err)
+		}
+		return &disconnect, nil
 
 	case AUTH:
 		panic("implement me")

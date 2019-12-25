@@ -118,7 +118,7 @@ var (
 	connect1 = Connect{
 		keepAlive:  10,
 		cleanStart: true,
-		props:      NewProperties(
+		props: NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
 		),
 		payload: ConnectPayload{
@@ -136,7 +136,7 @@ var (
 	connect2 = Connect{
 		keepAlive:  100,
 		cleanStart: true,
-		props:      NewProperties(
+		props: NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
@@ -156,7 +156,7 @@ var (
 	connect3 = Connect{
 		keepAlive:  100,
 		cleanStart: true,
-		props:      NewProperties(
+		props: NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
@@ -176,14 +176,14 @@ var (
 	connect4 = Connect{
 		keepAlive:  100,
 		cleanStart: false,
-		props:      NewProperties(
+		props: NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
 			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
 		),
 		payload: ConnectPayload{
-			clientID:    "clientID",
-			willProps:   NewProperties(
+			clientID: "clientID",
+			willProps: NewProperties(
 				Property{propID: UserProperty, payload: NewKeyValuePropPayload("willKey", "willValue")},
 			),
 			willRetain:  true,
@@ -198,7 +198,7 @@ var (
 	connect5 = Connect{
 		keepAlive:  10,
 		cleanStart: true,
-		props:      NewProperties(
+		props: NewProperties(
 			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
 		),
 		payload: ConnectPayload{
@@ -218,7 +218,7 @@ var (
 		help.NewByteSegment(
 			[]byte{byte(CONNACK) << 4, 17},
 			//variable header
-			[]byte{1, byte(Success)},
+			[]byte{1, byte(ConnectSuccess)},
 			//props length
 			[]byte{14},
 		),
@@ -235,7 +235,7 @@ var (
 		help.NewByteSegment(
 			[]byte{byte(CONNACK) << 4, 14},
 			//variable header
-			[]byte{0, byte(Success)},
+			[]byte{0, byte(ConnectSuccess)},
 			//props length
 			[]byte{11},
 		),
@@ -248,7 +248,7 @@ var (
 	)
 
 	connack1 = Connack{
-		connectReason:  Success,
+		connectReason:  ConnectSuccess,
 		sessionPresent: true,
 		props: NewProperties(
 			Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
@@ -257,11 +257,101 @@ var (
 	}
 
 	connack2 = Connack{
-		connectReason:  Success,
+		connectReason:  ConnectSuccess,
 		sessionPresent: false,
 		props: NewProperties(
 			Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
 			Property{propID: MaximumQoS, payload: BytePropPayload(Qos1)},
 		),
+	}
+
+	disconnect1Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(DISCONNECT) << 4, 15},
+			//variable header
+			[]byte{byte(DisconnectImplementationSpecificError)},
+			//props length
+			[]byte{13},
+		),
+		//props
+		help.NewByteSequence(
+			help.AnyOrder,
+			help.NewByteSegment([]byte{byte(ReasonString), 0, 5, 'e', 'r', 'r', 'o', 'r'}),
+			help.NewByteSegment([]byte{byte(SessionExpiryInterval), 0, 0, 0, 100}),
+		),
+	)
+
+	disconnect2Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(DISCONNECT) << 4, 15},
+			//variable header
+			[]byte{byte(DisconnectNormalDisconnection)},
+			//props length
+			[]byte{13},
+		),
+		//props
+		help.NewByteSequence(
+			help.AnyOrder,
+			help.NewByteSegment([]byte{byte(UserProperty), 0, 3, 'k', 'e', 'y', 0, 5, 'v', 'a', 'l', 'u', 'e'}),
+		),
+	)
+
+	disconnect3Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(DISCONNECT) << 4, 2},
+			//variable header
+			[]byte{byte(DisconnectNormalDisconnection)},
+			//prop length
+			[]byte{0},
+		),
+	)
+
+	disconnect4Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(DISCONNECT) << 4, 1},
+			//variable header
+			[]byte{byte(DisconnectNormalDisconnection)},
+		),
+	)
+
+	disconnect5Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(DISCONNECT) << 4, 0},
+		),
+	)
+
+	disconnect1 = Disconnect{
+		reason: DisconnectImplementationSpecificError,
+		props: NewProperties(
+			Property{propID: ReasonString, payload: StringPropPayload("error")},
+			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
+		),
+	}
+
+	disconnect2 = Disconnect{
+		reason: DisconnectNormalDisconnection,
+		props: NewProperties(
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+		),
+	}
+
+	disconnect3 = Disconnect{
+		reason: DisconnectNormalDisconnection,
+		props:  NewProperties(),
+	}
+
+	disconnect4 = Disconnect{
+		reason: DisconnectNormalDisconnection,
+		props:  NewProperties(),
+	}
+
+	disconnect5 = Disconnect{
+		reason: DisconnectNormalDisconnection,
+		props:  NewProperties(),
 	}
 )
