@@ -93,12 +93,10 @@ func (c Connack) WriteTo(writer io.Writer) (int64, error) {
 	return n, nil
 }
 
-func readConnack(reader io.Reader, connack *Connack, header header) error {
-	limitReader := io.LimitReader(reader, int64(header.length))
-
+func readConnack(reader io.Reader, connack *Connack) error {
 	// 3.2.2 Variable header
 	var buf [2]byte
-	_, err := io.ReadFull(limitReader, buf[:])
+	_, err := io.ReadFull(reader, buf[:])
 	if err != nil {
 		return fmt.Errorf("failed to read connack packet: failed to read variable header: %v", err)
 	}
@@ -115,7 +113,7 @@ func readConnack(reader io.Reader, connack *Connack, header header) error {
 	//TODO: check for allowed values
 
 	// 3.2.2.3 Connack properties
-	props, err := readProperties(limitReader)
+	props, err := readProperties(reader)
 	if err != nil {
 		return fmt.Errorf("failed to read connack packet: failed to read properties: %v", err)
 	}

@@ -61,14 +61,14 @@ func ReadPacket(reader io.Reader) (Packet, error) {
 }
 
 func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
+	limitedReader := io.LimitReader(reader, int64(header.length))
 	switch header.pktType {
 	case CONNECT:
 		if header.flags != 0 {
 			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connect packet: invalid flags '%d'", header.flags)
 		}
 		var connect Connect
-		limitReader := io.LimitReader(reader, int64(header.length))
-		err := readConnect(limitReader, &connect)
+		err := readConnect(limitedReader, &connect)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read Connect packet: %v", err)
 		}
@@ -88,7 +88,7 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connack packet: invalid flags '%d'", header.flags)
 		}
 		var connack Connack
-		err := readConnack(reader, &connack, header)
+		err := readConnack(limitedReader, &connack)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read connack packet: %v", err)
 		}
@@ -110,8 +110,9 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		if header.flags != 0 {
 			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Disconnect packet: invalid flags '%d'", header.flags)
 		}
+
 		var disconnect Disconnect
-		err := readDisconnect(reader, &disconnect, header)
+		err := readDisconnect(limitedReader, &disconnect, header.length)
 		if err != nil {
 			return nil, fmt.Errorf("failed to read disconnect packet: %v", err)
 		}
