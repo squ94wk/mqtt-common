@@ -22,7 +22,7 @@ type ConnectPayload struct {
 	clientID    string
 	willProps   Properties
 	willRetain  bool
-	willQoS     QoS
+	willQoS     byte
 	willTopic   topic.Topic
 	willPayload []byte
 	username    string
@@ -95,12 +95,12 @@ func (p *ConnectPayload) SetWillTopic(topic topic.Topic) {
 }
 
 //WillQoS returns the quality of service level of the will message of the connect control packet.
-func (p ConnectPayload) WillQoS() QoS {
+func (p ConnectPayload) WillQoS() byte {
 	return p.willQoS
 }
 
 //SetWillQoS sets the quality of service level of the will message of the connect control packet.
-func (p *ConnectPayload) SetWillQoS(qos QoS) {
+func (p *ConnectPayload) SetWillQoS(qos byte) {
 	p.willQoS = qos
 }
 
@@ -340,7 +340,7 @@ func readConnect(reader io.Reader, connect *Connect) error {
 	reserved := flags&byte(1) >= 1
 	cleanStart := flags&byte(1<<1) >= 1
 	hasWill := flags&byte(1<<2) >= 1
-	willQoS := QoS(flags & 24 >> 3)
+	willQoS := flags & 24 >> 3
 	willRetain := (flags)&byte(1<<5) >= 1
 	hasPassword := flags&byte(1<<6) >= 1
 	hasUsername := flags&byte(1<<7) >= 1

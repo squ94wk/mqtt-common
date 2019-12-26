@@ -7,17 +7,17 @@ import (
 
 type pktType byte
 
-//QoS is an alias for the three quality of service levels.
-type QoS byte
-
 //The three quality of service levels.
 const (
 	//QoS 0 = At most once delivery
-	Qos0 = QoS(0)
+	Qos0          = 0
+	QosAtMostOnce = 0
 	//QoS 1 = At least once delivery
-	Qos1 = QoS(1)
+	Qos1           = 1
+	QosAtLeastOnce = 1
 	//QoS 2 = Exactly once delivery
-	Qos2 = QoS(2)
+	Qos2           = 2
+	QosExactlyOnce = 2
 )
 
 //Constants for all control packet types
