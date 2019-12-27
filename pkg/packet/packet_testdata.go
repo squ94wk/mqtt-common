@@ -7,7 +7,7 @@ import (
 var (
 	connect1Bin = help.NewByteSegment(
 		[]byte{byte(CONNECT) << 4, 18},
-		[]byte{0, 4, 'M', 'Q', 'T', 'T', 5, 2, 0, 10},
+		[]byte{0, 4, 'M', 'Q', 'T', 'T', 5, 1 << 1, 0, 10},
 		[]byte{5, byte(SessionExpiryInterval), 0, 0, 0, 10},
 		[]byte{0, 0},
 	)
@@ -17,7 +17,7 @@ var (
 		help.NewByteSegment(
 			[]byte{byte(CONNECT) << 4, 46},
 			[]byte{0, 4, 'M', 'Q', 'T', 'T', 5},
-			[]byte{2},
+			[]byte{1 << 1},
 			[]byte{0, 100},
 			[]byte{33}),
 		help.NewByteSequence(
@@ -38,7 +38,7 @@ var (
 			[]byte{byte(CONNECT) << 4, 46},
 			[]byte{0, 4, 'M', 'Q', 'T', 'T', 5},
 			//flags
-			[]byte{2},
+			[]byte{1 << 1},
 			//keep alive
 			[]byte{0, 100},
 			//properties
@@ -66,7 +66,7 @@ var (
 			//fixed header
 			[]byte{0, 4, 'M', 'Q', 'T', 'T', 5},
 			//flags
-			[]byte{244},
+			[]byte{1<<2 | 2<<3 | 1<<5 | 1<<6 | 1<<7},
 			//keep alive
 			[]byte{0, 100},
 			//properties length
@@ -105,7 +105,7 @@ var (
 			//fixed header
 			[]byte{0, 4, 'M', 'Q', 'T', 'T', 5},
 			//flags
-			[]byte{2},
+			[]byte{1 << 1},
 			//keep alive
 			[]byte{0, 10},
 			//properties (len + session expiry interval)

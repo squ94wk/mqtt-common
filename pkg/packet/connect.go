@@ -219,14 +219,14 @@ func writeVariableHeader(c Connect, writer io.Writer) (int64, error) {
 		flags |= 1 << 1
 	}
 	if c.payload.willTopic != "" {
-		flags |= 1 << 2
+		flags |= 2 << 1
 	}
 	switch c.payload.willQoS {
 	case Qos0:
 	case Qos1:
 		flags |= 1 << 3
 	case Qos2:
-		flags |= 1 << 4
+		flags |= 2 << 3
 	default:
 		panic(fmt.Errorf("invalid option for QoS: %v", c.payload.willQoS))
 	}
@@ -337,13 +337,13 @@ func readConnect(reader io.Reader, connect *Connect) error {
 
 	// 3.1.2.3 Connect Flags
 	flags := buf[7]
-	reserved := flags&byte(1) >= 1
-	cleanStart := flags&byte(1<<1) >= 1
-	hasWill := flags&byte(1<<2) >= 1
+	reserved := flags&byte(1) > 0
+	cleanStart := flags&byte(1<<1) > 0
+	hasWill := flags&byte(1<<2) > 0
 	willQoS := flags & 24 >> 3
-	willRetain := (flags)&byte(1<<5) >= 1
-	hasPassword := flags&byte(1<<6) >= 1
-	hasUsername := flags&byte(1<<7) >= 1
+	willRetain := flags&byte(1<<5) > 0
+	hasPassword := flags&byte(1<<6) > 0
+	hasUsername := flags&byte(1<<7) > 0
 
 	if reserved {
 		return fmt.Errorf("malformed packet: reserved flag is set")
