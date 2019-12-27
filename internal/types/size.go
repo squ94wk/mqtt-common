@@ -10,15 +10,12 @@ func BinarySize(b []byte) uint32 {
 	return 2 + uint32(len(b))
 }
 
-//UInt16Size returns the length taken by a encoded 16 bit integer.
-func UInt16Size(i uint16) uint32 {
-	return 2
-}
-
-//UInt32Size returns the length taken by a encoded 32 bit integer.
-func UInt32Size(i uint32) uint32 {
-	return 4
-}
+const (
+	//UInt32Size returns the length taken by a encoded 32 bit integer.
+	UInt32Size uint32 = 4
+	//UInt16Size returns the length taken by a encoded 16 bit integer.
+	UInt16Size uint32 = 2
+)
 
 //VarIntSize returns the length taken by a encoded variable length integer.
 func VarIntSize(i uint32) uint32 {
