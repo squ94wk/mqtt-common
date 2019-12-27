@@ -359,4 +359,90 @@ var (
 		reason: DisconnectNormalDisconnection,
 		props:  NewProperties(),
 	}
+
+	subscribe1Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(SUBSCRIBE)<<4 | 2, 39},
+			//variable header
+			//packetID
+			[]byte{0, 100},
+			//props length
+			[]byte{16},
+		),
+		//props
+		help.NewByteSequence(
+			help.AnyOrder,
+			help.NewByteSegment([]byte{byte(SubscriptionIdentifier), 144, 78}),
+			help.NewByteSegment([]byte{byte(UserProperty), 0, 3, 'k', 'e', 'y', 0, 5, 'v', 'a', 'l', 'u', 'e'}),
+		),
+		//subscriptions
+		help.NewByteSequence(
+			help.InOrder,
+			help.NewByteSegment([]byte{0, 7, '/', 't', 'o', 'p', 'i', 'c', '1', 0}),
+			help.NewByteSegment([]byte{0, 7, '/', 't', 'o', 'p', 'i', 'c', '2', 1 | 1<<2 | 1<<3 | 1<<4}),
+		),
+	)
+
+	subscribe2Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(SUBSCRIBE)<<4 | 2, 16},
+			//variable header
+			//packetID
+			[]byte{3, 232},
+			//props length
+			[]byte{3},
+		),
+		//props
+		help.NewByteSequence(
+			help.AnyOrder,
+			help.NewByteSegment([]byte{byte(SubscriptionIdentifier), 232, 7}),
+		),
+		//subscriptions
+		help.NewByteSequence(
+			help.InOrder,
+			help.NewByteSegment([]byte{0, 7, '/', 't', 'o', 'p', 'i', 'c', '3', 0 | 2 | 2<<4}),
+		),
+	)
+
+	subscribe1 = Subscribe{
+		packetID: 100,
+		props: NewProperties(
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(10000)},
+		),
+		filters: []SubscriptionFilter{
+			{
+				filter:            "/topic1",
+				maxQoS:            Qos0,
+				noLocal:           false,
+				retainAsPublished: false,
+				retainHandling:    0,
+			},
+			{
+				filter:            "/topic2",
+				maxQoS:            Qos1,
+				noLocal:           true,
+				retainAsPublished: true,
+				retainHandling:    1,
+			},
+		},
+	}
+
+	subscribe2 = Subscribe{
+		packetID: 1000,
+		props: NewProperties(
+			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(1000)},
+		),
+		filters: []SubscriptionFilter{
+			{
+				filter:            "/topic3",
+				maxQoS:            Qos2,
+				noLocal:           false,
+				retainAsPublished: false,
+				retainHandling:    2,
+			},
+		},
+	}
 )

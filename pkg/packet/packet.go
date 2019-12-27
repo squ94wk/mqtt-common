@@ -99,6 +99,16 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 	case PUBREL:
 	case PUBCOMP:
 	case SUBSCRIBE:
+		if header.flags != 2 {
+			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Subscribe packet: invalid flags '%d'", header.flags)
+		}
+		var subscribe Subscribe
+		err := readSubscribe(limitedReader, &subscribe)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read subscribe packet: %v", err)
+		}
+		return &subscribe, nil
+
 	case SUBACK:
 	case UNSUBSCRIBE:
 	case UNSUBACK:
