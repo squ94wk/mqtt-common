@@ -29,7 +29,7 @@ func TestReadProperties(t *testing.T) {
 				)),
 			},
 			want: NewProperties(
-				Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
+				Property{propID: SessionExpiryInterval, payload: Int32PropPayload(17)},
 				Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
 			),
 		},

@@ -358,7 +358,6 @@ func readConnect(reader io.Reader, connect *Connect) error {
 	}
 
 	connect.SetCleanStart(cleanStart)
-	connect.payload.SetWillRetain(willRetain)
 
 	// 3.1.2.6 Will QoS
 	if willQoS > 2 {
@@ -381,6 +380,7 @@ func readConnect(reader io.Reader, connect *Connect) error {
 
 	// 3.1.3 Payload
 	payload := ConnectPayload{}
+	payload.SetWillRetain(willRetain)
 	// 3.1.3.1 ClientID
 	clientID, err := types.ReadString(reader)
 	if err != nil {

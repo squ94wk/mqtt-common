@@ -1,8 +1,13 @@
 package packet
 
 import (
+	"github.com/go-test/deep"
 	"github.com/squ94wk/mqtt-common/internal/help"
 )
+
+func init() {
+	deep.CompareUnexportedFields = true
+}
 
 var (
 	connect1Bin = help.NewByteSegment(
