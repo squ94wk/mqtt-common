@@ -110,6 +110,16 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		return &subscribe, nil
 
 	case SUBACK:
+		if header.flags != 0 {
+			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Suback packet: invalid flags '%d'", header.flags)
+		}
+		var suback Suback
+		err := readSuback(limitedReader, &suback)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read suback packet: %v", err)
+		}
+		return &suback, nil
+
 	case UNSUBSCRIBE:
 	case UNSUBACK:
 	case PINGREQ:

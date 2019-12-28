@@ -445,4 +445,74 @@ var (
 			},
 		},
 	}
+
+	suback1Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(SUBACK) << 4, 22},
+			//variable header
+			//packetID
+			[]byte{0, 100},
+			//props length
+			[]byte{16},
+		),
+		//props
+		help.NewByteSequence(
+			help.AnyOrder,
+			help.NewByteSegment([]byte{byte(SubscriptionIdentifier), 144, 78}),
+			help.NewByteSegment([]byte{byte(UserProperty), 0, 3, 'k', 'e', 'y', 0, 5, 'v', 'a', 'l', 'u', 'e'}),
+		),
+		//reason codes
+		help.NewByteSegment([]byte{
+			byte(SubackGrantedQoS2),
+			byte(SubackGrantedQoS0),
+			byte(SubackQuotaExceeded),
+		}),
+	)
+
+	suback2Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(SUBACK) << 4, 8},
+			//variable header
+			//packetID
+			[]byte{3, 232},
+			//props length
+			[]byte{3},
+		),
+		//props
+		help.NewByteSequence(
+			help.AnyOrder,
+			help.NewByteSegment([]byte{byte(SubscriptionIdentifier), 232, 7}),
+		),
+		//reason codes
+		help.NewByteSegment([]byte{
+			byte(SubackGrantedQoS0),
+			byte(SubackImplementationSpecificError),
+		}),
+	)
+
+	suback1 = Suback{
+		packetID: 100,
+		props: NewProperties(
+			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(10000)},
+		),
+		reasons: []SubackReason{
+			SubackGrantedQoS2,
+			SubackGrantedQoS0,
+			SubackQuotaExceeded,
+		},
+	}
+
+	suback2 = Suback{
+		packetID: 1000,
+		props: NewProperties(
+			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(1000)},
+		),
+		reasons: []SubackReason{
+			SubackGrantedQoS0,
+			SubackImplementationSpecificError,
+		},
+	}
 )

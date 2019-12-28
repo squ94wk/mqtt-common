@@ -6,6 +6,9 @@ type ConnectReason byte
 //DisconnectReason is an alias for all defined disconnect reason codes a disconnect control packet can have.
 type DisconnectReason byte
 
+//SubackReason is an alias for all defined reason codes a suback control packet can have.
+type SubackReason byte
+
 //Names for all defined connect reason codes a connack control packet can have.
 const (
 	ConnectSuccess                     ConnectReason = 0   // The Connection is accepted.
@@ -63,4 +66,20 @@ const (
 	DisconnectMaximumConnectTime                  DisconnectReason = 160 // The maximum connection time authorized for this connection has been exceeded.
 	DisconnectSubscriptionIdentifiersNotSupported DisconnectReason = 161 // The Server does not support Subscription Identifiers; the subscription is not accepted.
 	DisconnectWildcardSubscriptionsNotSupported   DisconnectReason = 162 // The Server does not support Wildcard Subscriptions; the subscription is not accepted.
+)
+
+//Names for all defined subscribe reason codes a suback control packet can have.
+const (
+	SubackGrantedQoS0                         SubackReason = 0   // The subscription is accepted and the maximum QoS sent will be QoS 0.This might be a lower QoS than was requested.
+	SubackQoS1Granted                         SubackReason = 1   // The subscription is accepted and the maximum QoS sent will be QoS 1.This might be a lower QoS than was requested.
+	SubackGrantedQoS2                         SubackReason = 2   // The subscription is accepted and any received QoS will be sent to this subscription.
+	SubackUnspecifiedError                    SubackReason = 128 // The subscription is not accepted and the Server either does not wish to reveal the reason or none of the other Reason Codes apply.
+	SubackImplementationSpecificError         SubackReason = 131 // The SUBSCRIBE is valid but the Server does not accept it.
+	SubackNotAuthorized                       SubackReason = 135 // The Client is not authorized to make this subscription.
+	SubackTopicFilterInvalid                  SubackReason = 143 // The Topic Filter is correctly formed but is not allowed for thisClient.
+	SubackPacketIdentifierInUse               SubackReason = 145 // The specified Packet Identifier is already in use.
+	SubackQuotaExceeded                       SubackReason = 151 // An implementation or administrative imposed limit has been exceeded.
+	SubackSharedSubscriptionsNotSupported     SubackReason = 158 // The Server does not support Shared Subscriptions for this Client.
+	SubackSubscriptionIdentifiersNotSupported SubackReason = 161 // The Server does not support Subscription Identifiers; the subscription is not accepted.
+	SubackWildcardSubscriptionsNotSupported   SubackReason = 162 // The Server does not support Wildcard Subscriptions; the subscription is not accepted.
 )
