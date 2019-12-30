@@ -63,6 +63,11 @@ func (c Connect) Payload() ConnectPayload {
 	return c.payload
 }
 
+//SetPayload sets the payload of the connect control packet.
+func (c *Connect) SetPayload(payload ConnectPayload) {
+	c.payload = payload
+}
+
 //ClientID returns the client ID of the connect control packet payload.
 func (p ConnectPayload) ClientID() string {
 	return p.clientID
