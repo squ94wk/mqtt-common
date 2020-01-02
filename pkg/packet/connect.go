@@ -151,19 +151,19 @@ func (p *ConnectPayload) SetWillRetain(willRetain bool) {
 //WriteTo writes the connect control packet to writer according to the mqtt protocol.
 func (c Connect) WriteTo(writer io.Writer) (int64, error) {
 	var n int64
-	n1, err := writeFixedHeader(c, writer)
+	n1, err := writeFixedConnectHeader(c, writer)
 	n += n1
 	if err != nil {
 		return n, fmt.Errorf("failed to write connect packet: failed to write fixed header: %v", err)
 	}
 
-	n2, err := writeVariableHeader(c, writer)
+	n2, err := writeVariableConnectHeader(c, writer)
 	n += n2
 	if err != nil {
 		return n, fmt.Errorf("failed to write connect packet: failed to write variable header: %v", err)
 	}
 
-	n3, err := writePayload(c, writer)
+	n3, err := writeConnectPayload(c, writer)
 	n += n3
 	if err != nil {
 		return n, fmt.Errorf("failed to write connect packet: failed to write payload: %v", err)
@@ -172,7 +172,7 @@ func (c Connect) WriteTo(writer io.Writer) (int64, error) {
 	return n, nil
 }
 
-func writeFixedHeader(c Connect, writer io.Writer) (int64, error) {
+func writeFixedConnectHeader(c Connect, writer io.Writer) (int64, error) {
 	var n int64
 	firstHeaderByte := byte(CONNECT) << 4
 	n1, err := writer.Write([]byte{firstHeaderByte})
@@ -205,7 +205,7 @@ func writeFixedHeader(c Connect, writer io.Writer) (int64, error) {
 	return n, nil
 }
 
-func writeVariableHeader(c Connect, writer io.Writer) (int64, error) {
+func writeVariableConnectHeader(c Connect, writer io.Writer) (int64, error) {
 	var n int64
 	// 3.1.2.1 Protocol Name
 	// 3.1.2.2 Protocol Version
@@ -267,7 +267,7 @@ func writeVariableHeader(c Connect, writer io.Writer) (int64, error) {
 	return n, nil
 }
 
-func writePayload(c Connect, writer io.Writer) (int64, error) {
+func writeConnectPayload(c Connect, writer io.Writer) (int64, error) {
 	var n int64
 	// 3.1.3.1 ClientID
 	n1, err := types.WriteStringTo(writer, c.payload.clientID)
