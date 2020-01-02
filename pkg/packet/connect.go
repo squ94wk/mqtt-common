@@ -378,7 +378,7 @@ func readConnect(reader io.Reader, connect *Connect) error {
 	// 3.1.2.11 Properties
 	props, err := readProperties(reader)
 	if err != nil {
-		return fmt.Errorf("failed to read connect packet: failed to read will properties: %v", err)
+		return fmt.Errorf("failed to read connect packet: failed to read properties: %v", err)
 	}
 	connect.props = props
 
