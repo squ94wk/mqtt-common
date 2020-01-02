@@ -75,13 +75,12 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		return &connect, nil
 
 	case PUBLISH:
-		//var publish Publish
-		//err := ReadPublish(reader, &publish, header)
-		//if err != nil {
-		//return nil, fmt.Errorf("failed to read Publish packet: %v", err)
-		//}
-		//log.Info("read Publish packet")
-		//return &publish, nil
+		var publish Publish
+		err := readPublish(limitedReader.(*io.LimitedReader), &publish, header.flags)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read Publish packet: %v", err)
+		}
+		return &publish, nil
 
 	case CONNACK:
 		if header.flags != 0 {
