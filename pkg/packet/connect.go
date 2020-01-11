@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/squ94wk/mqtt-common/internal/types"
-	"github.com/squ94wk/mqtt-common/pkg/topic"
 )
 
 //Connect defines the connect control packet.
@@ -23,7 +22,7 @@ type ConnectPayload struct {
 	willProps   Properties
 	willRetain  bool
 	willQoS     byte
-	willTopic   topic.Topic
+	willTopic   string
 	willPayload []byte
 	username    string
 	password    []byte
@@ -85,12 +84,12 @@ func (p *ConnectPayload) SetWillProps(props Properties) {
 }
 
 //WillTopic returns the topic of the will message of the connect control packet.
-func (p ConnectPayload) WillTopic() topic.Topic {
+func (p ConnectPayload) WillTopic() string {
 	return p.willTopic
 }
 
 //SetWillTopic sets the topic of the will message of the connect control packet.
-func (p *ConnectPayload) SetWillTopic(topic topic.Topic) {
+func (p *ConnectPayload) SetWillTopic(topic string) {
 	p.willTopic = topic
 }
 
@@ -183,7 +182,7 @@ func writeFixedHeader(c Connect, writer io.Writer) (int64, error) {
 	remainingLength += types.StringSize(c.payload.clientID)
 	if c.payload.willTopic != "" {
 		remainingLength += c.payload.willProps.size()
-		remainingLength += types.StringSize(string(c.payload.willTopic))
+		remainingLength += types.StringSize(c.payload.willTopic)
 		remainingLength += types.BinarySize(c.payload.willPayload)
 	}
 	if c.payload.username != "" {
@@ -282,7 +281,7 @@ func writePayload(c Connect, writer io.Writer) (int64, error) {
 		}
 
 		// 3.1.3.3 Will topic
-		n3, err := types.WriteStringTo(writer, string(c.payload.willTopic))
+		n3, err := types.WriteStringTo(writer, c.payload.willTopic)
 		n += n3
 		if err != nil {
 			return n, fmt.Errorf("failed to write connect packet: failed to write will topic: %v", err)
@@ -408,7 +407,7 @@ func readConnect(reader io.Reader, connect *Connect) error {
 		if err != nil {
 			return fmt.Errorf("failed to read will topic: %v", err)
 		}
-		payload.SetWillTopic(topic.Topic(willTopic))
+		payload.SetWillTopic(willTopic)
 
 		// 3.1.3.4 Will payload
 		willPayload, err := types.ReadBinary(reader)
