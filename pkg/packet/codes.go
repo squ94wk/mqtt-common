@@ -9,27 +9,27 @@ type DisconnectReason byte
 //Names for all defined connect reason codes a connack control packet can have.
 const (
 	ConnectSuccess                     ConnectReason = 0   // The Connection is accepted.
-	ConnectUnspecifiedError                          = 128 // The Server does not wish to reveal the reason for the failure, or none of the other Reason Codes apply.
-	ConnectMalformedPacket                           = 129 // Data within the CONNECT packet could not be correctly parsed.
-	ConnectProtocolError                             = 130 // Data in the CONNECT packet does not conform to this specification.
-	ConnectImplementationSpecificError               = 131 // The CONNECT is valid but is not accepted by this Server.
-	ConnectUnsupportedProtocolVersion                = 132 // The Server does not support the version of the MQTT protocol requested by the Client.
-	ConnectClientIdentifierNotValid                  = 133 // The Client Identifier is a valid string but is not allowed by the Server.
-	ConnectBadUserNameOrPassword                     = 134 // The Server does not accept the User Name or Password specified by the Client
-	ConnectNotAuthorized                             = 135 // The Client is not authorized to connect.
-	ConnectServerUnavailable                         = 136 // The MQTT Server is not available.
-	ConnectServerBusy                                = 137 // The Server is busy. Try again later.
-	ConnectBanned                                    = 138 // This Client has been banned by administrative action. Contact the server administrator.
-	ConnectBadAuthenticationMethod                   = 140 // The authentication method is not supported or does not match the authentication method currently in use.
-	ConnectTopicNameInvalid                          = 144 // The Will Topic Name is not malformed, but is not accepted by this Server.
-	ConnectPacketTooLarge                            = 149 // The CONNECT packet exceeded the maximum permissible size.
-	ConnectQuotaExceeded                             = 151 // An implementation or administrative imposed limit has been exceeded.
-	ConnectPayloadFormatInvalid                      = 153 // The Will Payload does not match the specified Payload Format Indicator.
-	ConnectRetainNotSupported                        = 154 // The Server does not support retained messages, and Will Retain was set to 1.
-	ConnectQoSNotSupported                           = 155 // The Server does not support the QoS set in Will QoS.
-	ConnectUseAnotherServer                          = 156 // The Client should temporarily use another server.
-	ConnectServerMoved                               = 157 // The Client should permanently use another server.
-	ConnectConnectionRateExceeded                    = 159 // The connection rate limit has been exceeded.
+	ConnectUnspecifiedError            ConnectReason = 128 // The Server does not wish to reveal the reason for the failure, or none of the other Reason Codes apply.
+	ConnectMalformedPacket             ConnectReason = 129 // Data within the CONNECT packet could not be correctly parsed.
+	ConnectProtocolError               ConnectReason = 130 // Data in the CONNECT packet does not conform to this specification.
+	ConnectImplementationSpecificError ConnectReason = 131 // The CONNECT is valid but is not accepted by this Server.
+	ConnectUnsupportedProtocolVersion  ConnectReason = 132 // The Server does not support the version of the MQTT protocol requested by the Client.
+	ConnectClientIdentifierNotValid    ConnectReason = 133 // The Client Identifier is a valid string but is not allowed by the Server.
+	ConnectBadUserNameOrPassword       ConnectReason = 134 // The Server does not accept the User Name or Password specified by the Client
+	ConnectNotAuthorized               ConnectReason = 135 // The Client is not authorized to connect.
+	ConnectServerUnavailable           ConnectReason = 136 // The MQTT Server is not available.
+	ConnectServerBusy                  ConnectReason = 137 // The Server is busy. Try again later.
+	ConnectBanned                      ConnectReason = 138 // This Client has been banned by administrative action. Contact the server administrator.
+	ConnectBadAuthenticationMethod     ConnectReason = 140 // The authentication method is not supported or does not match the authentication method currently in use.
+	ConnectTopicNameInvalid            ConnectReason = 144 // The Will Topic Name is not malformed, but is not accepted by this Server.
+	ConnectPacketTooLarge              ConnectReason = 149 // The CONNECT packet exceeded the maximum permissible size.
+	ConnectQuotaExceeded               ConnectReason = 151 // An implementation or administrative imposed limit has been exceeded.
+	ConnectPayloadFormatInvalid        ConnectReason = 153 // The Will Payload does not match the specified Payload Format Indicator.
+	ConnectRetainNotSupported          ConnectReason = 154 // The Server does not support retained messages, and Will Retain was set to 1.
+	ConnectQoSNotSupported             ConnectReason = 155 // The Server does not support the QoS set in Will QoS.
+	ConnectUseAnotherServer            ConnectReason = 156 // The Client should temporarily use another server.
+	ConnectServerMoved                 ConnectReason = 157 // The Client should permanently use another server.
+	ConnectConnectionRateExceeded      ConnectReason = 159 // The connection rate limit has been exceeded.
 )
 
 //Names for all defined disconnect reason codes a disconnect control packet can have.
