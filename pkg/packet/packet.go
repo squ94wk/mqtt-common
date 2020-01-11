@@ -65,7 +65,7 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 	switch header.pktType {
 	case CONNECT:
 		if header.flags != 0 {
-			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connect packet: invalid flags '%d'", header.flags)
+			return nil, fmt.Errorf("failed to read Connect packet: invalid fixed header: invalid flags '%d'", header.flags)
 		}
 		var connect Connect
 		err := readConnect(limitedReader, &connect)
@@ -85,12 +85,12 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 
 	case CONNACK:
 		if header.flags != 0 {
-			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Connack packet: invalid flags '%d'", header.flags)
+			return nil, fmt.Errorf("failed to read Connack packet: invalid fixed header: invalid flags '%d'", header.flags)
 		}
 		var connack Connack
 		err := readConnack(limitedReader, &connack)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read connack packet: %v", err)
+			return nil, fmt.Errorf("failed to read Connack packet: %v", err)
 		}
 		return &connack, nil
 
@@ -100,23 +100,23 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 	case PUBCOMP:
 	case SUBSCRIBE:
 		if header.flags != 2 {
-			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Subscribe packet: invalid flags '%d'", header.flags)
+			return nil, fmt.Errorf("failed to read Sbuscribe packet: invalid fixed header: invalid flags '%d'", header.flags)
 		}
 		var subscribe Subscribe
 		err := readSubscribe(limitedReader, &subscribe)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read subscribe packet: %v", err)
+			return nil, fmt.Errorf("failed to read Subscribe packet: %v", err)
 		}
 		return &subscribe, nil
 
 	case SUBACK:
 		if header.flags != 0 {
-			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Suback packet: invalid flags '%d'", header.flags)
+			return nil, fmt.Errorf("failed to read Suback packet: invalid fixed header: invalid flags '%d'", header.flags)
 		}
 		var suback Suback
 		err := readSuback(limitedReader, &suback)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read suback packet: %v", err)
+			return nil, fmt.Errorf("failed to read Suback packet: %v", err)
 		}
 		return &suback, nil
 
@@ -128,13 +128,13 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 
 	case DISCONNECT:
 		if header.flags != 0 {
-			return nil, fmt.Errorf("failed to read packet: invalid fixed header of Disconnect packet: invalid flags '%d'", header.flags)
+			return nil, fmt.Errorf("failed to read Disconnect packet: invalid fixed header: invalid flags '%d'", header.flags)
 		}
 
 		var disconnect Disconnect
 		err := readDisconnect(limitedReader, &disconnect, header.length)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read disconnect packet: %v", err)
+			return nil, fmt.Errorf("failed to read Disconnect packet: %v", err)
 		}
 		return &disconnect, nil
 
