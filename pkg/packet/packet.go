@@ -94,10 +94,6 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		}
 		return &connack, nil
 
-	case PUBACK:
-	case PUBREC:
-	case PUBREL:
-	case PUBCOMP:
 	case SUBSCRIBE:
 		if header.flags != 2 {
 			return nil, fmt.Errorf("failed to read Sbuscribe packet: invalid fixed header: invalid flags '%d'", header.flags)
@@ -120,9 +116,20 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		}
 		return &suback, nil
 
+	case PUBACK:
+		fallthrough
+	case PUBREC:
+		fallthrough
+	case PUBREL:
+		fallthrough
+	case PUBCOMP:
+		fallthrough
 	case UNSUBSCRIBE:
+		fallthrough
 	case UNSUBACK:
+		fallthrough
 	case PINGREQ:
+		fallthrough
 	case PINGRESP:
 		panic("implement me")
 
@@ -130,7 +137,6 @@ func readRestOfPacket(reader io.Reader, header header) (Packet, error) {
 		if header.flags != 0 {
 			return nil, fmt.Errorf("failed to read Disconnect packet: invalid fixed header: invalid flags '%d'", header.flags)
 		}
-
 		var disconnect Disconnect
 		err := readDisconnect(limitedReader, &disconnect, header.length)
 		if err != nil {
