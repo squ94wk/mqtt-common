@@ -8,8 +8,8 @@ import (
 
 //Property defines a property composition.
 type Property struct {
-	propID  uint32
-	payload PropertyPayload
+	PropID  uint32
+	Payload PropertyPayload
 }
 
 //PropertyPayload defines the part of a property that is specific to the type of property.
@@ -35,8 +35,8 @@ type StringPropPayload string
 
 //KeyValuePropPayload defines a key value property made up of two strings.
 type KeyValuePropPayload struct {
-	key   string
-	value string
+	Key   string
+	Value string
 }
 
 //VarIntPropPayload defines a variable length integer property.
@@ -79,8 +79,8 @@ const (
 //NewProperty constructs a new Property.
 func NewProperty(propID uint32, payload PropertyPayload) Property {
 	return Property{
-		propID:  propID,
-		payload: payload,
+		PropID:  propID,
+		Payload: payload,
 	}
 }
 
@@ -88,45 +88,20 @@ func NewProperty(propID uint32, payload PropertyPayload) Property {
 func NewProperties(props ...Property) Properties {
 	properties := make(map[uint32][]Property)
 	for _, p := range props {
-		if withID, ok := properties[p.PropID()]; ok {
-			properties[p.PropID()] = append(withID, p)
+		if withID, ok := properties[p.PropID]; ok {
+			properties[p.PropID] = append(withID, p)
 		} else {
-			properties[p.PropID()] = []Property{p}
+			properties[p.PropID] = []Property{p}
 		}
 	}
 	return properties
-}
-
-//NewKeyValuePropPayload is the constructor for a key value property.
-func NewKeyValuePropPayload(key string, value string) KeyValuePropPayload {
-	return KeyValuePropPayload{key: key, value: value}
-}
-
-//PropID returns the property identifier of the property.
-func (p Property) PropID() uint32 {
-	return p.propID
-}
-
-//Payload returns the payload of the property.
-func (p Property) Payload() PropertyPayload {
-	return p.payload
-}
-
-//Key returns the key of the key value property.
-func (p KeyValuePropPayload) Key() string {
-	return p.key
-}
-
-//Value returns the value of the key value property.
-func (p KeyValuePropPayload) Value() string {
-	return p.value
 }
 
 //Add adds a property to p.
 //The property is appended to the existing ones if p already contains properties with the same identifier.
 //Add makes no assumptions as to if the mqtt protocol allows multiple properties of that identifier.
 func (p Properties) Add(prop Property) {
-	propID := prop.PropID()
+	propID := prop.PropID
 	properties, ok := p[propID]
 	if !ok {
 		p[propID] = []Property{prop}
@@ -143,7 +118,7 @@ func (p Properties) Reset() {
 }
 
 func (p Property) size() uint32 {
-	return types.VarIntSize(p.propID) + p.payload.size()
+	return types.VarIntSize(p.PropID) + p.Payload.size()
 }
 
 func (p BytePropPayload) size() uint32 {
@@ -163,7 +138,7 @@ func (p StringPropPayload) size() uint32 {
 }
 
 func (p KeyValuePropPayload) size() uint32 {
-	return uint32(2 + len(p.key) + 2 + len(p.value))
+	return uint32(2 + len(p.Key) + 2 + len(p.Value))
 }
 
 func (p VarIntPropPayload) size() uint32 {

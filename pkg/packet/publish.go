@@ -10,83 +10,13 @@ import (
 
 //Publish defines the publish control packet.
 type Publish struct {
-	dup      bool
-	qos      byte
-	retain   bool
-	topic    topic.Topic
-	packetID uint16
-	props    Properties
-	payload  []byte
-}
-
-//Dup returns the value of the DUP flag of the publish control packet.
-func (p Publish) Dup() bool {
-	return p.dup
-}
-
-//SetDup sets the value of the DUP flag of the publish control packet.
-func (p *Publish) SetDup(dup bool) {
-	p.dup = dup
-}
-
-//QoS returns the value of the QoS flag of the publish control packet.
-func (p Publish) QoS() byte {
-	return p.qos
-}
-
-//SetQoS sets the value of the QoS flag of the publish control packet.
-func (p *Publish) SetQoS(qos byte) {
-	p.qos = qos
-}
-
-//Retain returns the value of the Retain flag of the publish control packet.
-func (p Publish) Retain() bool {
-	return p.retain
-}
-
-//SetRetain sets the value of the Retain flag of the publish control packet.
-func (p *Publish) SetRetain(retain bool) {
-	p.retain = retain
-}
-
-//Topic returns the topic of the publish control packet.
-func (p Publish) Topic() topic.Topic {
-	return p.topic
-}
-
-//SetTopic sets the topic of the publish control packet.
-func (p *Publish) SetTopic(topic topic.Topic) {
-	p.topic = topic
-}
-
-//PacketID returns the value of the publish control packet.
-func (p Publish) PacketID() uint16 {
-	return p.packetID
-}
-
-//SetPacketID sets the value of the publish control packet.
-func (p *Publish) SetPacketID(packetID uint16) {
-	p.packetID = packetID
-}
-
-//Payload returns the payload of the publish control packet.
-func (p Publish) Payload() []byte {
-	return p.payload
-}
-
-//SetPayload sets the payload of the publish control packet.
-func (p *Publish) SetPayload(payload []byte) {
-	p.payload = payload
-}
-
-//Props returns the properties of the publish control packet.
-func (p Publish) Props() Properties {
-	return p.props
-}
-
-//SetProps replaces the properties of the publish control packet.
-func (p *Publish) SetProps(props Properties) {
-	p.props = props
+	Dup      bool
+	Qos      byte
+	Retain   bool
+	Topic    topic.Topic
+	PacketID uint16
+	Props    Properties
+	Payload  []byte
 }
 
 //WriteTo writes the publish control packet to writer according to the mqtt protocol.
@@ -104,7 +34,7 @@ func (p Publish) WriteTo(writer io.Writer) (int64, error) {
 		return n, fmt.Errorf("failed to write publish packet: failed to write variable header: %v", err)
 	}
 
-	n3, err := writer.Write(p.payload)
+	n3, err := writer.Write(p.Payload)
 	n += int64(n3)
 	if err != nil {
 		return n, fmt.Errorf("failed to write publish packet: failed to write payload: %v", err)
@@ -116,11 +46,11 @@ func (p Publish) WriteTo(writer io.Writer) (int64, error) {
 func writeFixedPublishHeader(p Publish, writer io.Writer) (int64, error) {
 	var n int64
 	firstHeaderByte := byte(PUBLISH) << 4
-	if p.retain {
+	if p.Retain {
 		firstHeaderByte |= 1
 	}
-	firstHeaderByte |= p.qos << 1
-	if p.dup {
+	firstHeaderByte |= p.Qos << 1
+	if p.Dup {
 		firstHeaderByte |= 1 << 3
 	}
 	n1, err := writer.Write([]byte{firstHeaderByte})
@@ -130,10 +60,10 @@ func writeFixedPublishHeader(p Publish, writer io.Writer) (int64, error) {
 	}
 
 	// Remaining length
-	var remainingLength = types.StringSize(p.topic.String())
+	var remainingLength = types.StringSize(p.Topic.String())
 	remainingLength += types.UInt16Size
-	remainingLength += p.props.size()
-	remainingLength += uint32(len(p.payload))
+	remainingLength += p.Props.size()
+	remainingLength += uint32(len(p.Payload))
 	n2, err := types.WriteVarIntTo(writer, remainingLength)
 	n += n2
 	if err != nil {
@@ -146,20 +76,20 @@ func writeFixedPublishHeader(p Publish, writer io.Writer) (int64, error) {
 func writeVariablePublishHeader(p Publish, writer io.Writer) (int64, error) {
 	var n int64
 	// 3.3.2.1 Topic name
-	n1, err := types.WriteStringTo(writer, p.topic.String())
+	n1, err := types.WriteStringTo(writer, p.Topic.String())
 	n += n1
 	if err != nil {
 		return n, fmt.Errorf("failed to write topic name: %v", err)
 	}
 	// 3.3.2.2 Packet ID
-	n2, err := types.WriteUInt16To(writer, p.packetID)
+	n2, err := types.WriteUInt16To(writer, p.PacketID)
 	n += n2
 	if err != nil {
 		return n, fmt.Errorf("failed to write packet ID: %v", err)
 	}
 
 	// 3.3.2.3 Properties
-	n3, err := p.props.WriteTo(writer)
+	n3, err := p.Props.WriteTo(writer)
 	n += n3
 	if err != nil {
 		return n, fmt.Errorf("failed to write properties: %v", err)
@@ -170,13 +100,13 @@ func writeVariablePublishHeader(p Publish, writer io.Writer) (int64, error) {
 
 func readPublish(reader *io.LimitedReader, publish *Publish, headerFirstByte byte) error {
 	// 3.3.1 Fixed header
-	publish.retain = headerFirstByte&1 > 0
+	publish.Retain = headerFirstByte&1 > 0
 	qos := headerFirstByte & (3 << 1) >> 1
 	if qos == 3 {
 		return fmt.Errorf("malformed packet: invalid QoS value %d", qos)
 	}
-	publish.qos = qos
-	publish.dup = headerFirstByte&(1<<3) > 0
+	publish.Qos = qos
+	publish.Dup = headerFirstByte&(1<<3) > 0
 
 	// 3.3.2 Variable header
 	// 3.3.2.1 Topic Name
@@ -188,7 +118,7 @@ func readPublish(reader *io.LimitedReader, publish *Publish, headerFirstByte byt
 	if err != nil {
 		return fmt.Errorf("malformed packet: invalid topic name: %s", topicName)
 	}
-	publish.topic = parsedTopic
+	publish.Topic = parsedTopic
 
 	// 3.3.2.2 Packet ID
 	packetID, err := types.ReadUInt16(reader)
@@ -198,14 +128,14 @@ func readPublish(reader *io.LimitedReader, publish *Publish, headerFirstByte byt
 	if packetID == 0 {
 		return fmt.Errorf("malformed packet: invalid packet ID: %d", packetID)
 	}
-	publish.packetID = packetID
+	publish.PacketID = packetID
 
 	// 3.3.2.3 Properties
 	props, err := readProperties(reader)
 	if err != nil {
 		return fmt.Errorf("failed to read publish packet: failed to read properties: %v", err)
 	}
-	publish.props = props
+	publish.Props = props
 
 	// 3.3.3 Payload
 	payload := make([]byte, reader.N)
@@ -214,6 +144,6 @@ func readPublish(reader *io.LimitedReader, publish *Publish, headerFirstByte byt
 		return fmt.Errorf("failed to read publish packet: failed to read payload: %v", err)
 	}
 
-	publish.payload = payload
+	publish.Payload = payload
 	return nil
 }

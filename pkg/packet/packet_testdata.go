@@ -122,100 +122,100 @@ var (
 	)
 
 	connect1 = Connect{
-		keepAlive:  10,
-		cleanStart: true,
-		props: NewProperties(
-			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
+		KeepAlive:  10,
+		CleanStart: true,
+		Props: NewProperties(
+			Property{PropID: SessionExpiryInterval, Payload: Int32PropPayload(10)},
 		),
-		payload: ConnectPayload{
-			clientID:    "",
-			willProps:   nil,
-			willRetain:  false,
-			willQoS:     Qos0,
-			willTopic:   "",
-			willPayload: nil,
-			username:    "",
-			password:    nil,
+		Payload: ConnectPayload{
+			ClientID:    "",
+			WillProps:   nil,
+			WillRetain:  false,
+			WillQoS:     Qos0,
+			WillTopic:   "",
+			WillPayload: nil,
+			Username:    "",
+			Password:    nil,
 		},
 	}
 
 	connect2 = Connect{
-		keepAlive:  100,
-		cleanStart: true,
-		props: NewProperties(
-			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
+		KeepAlive:  100,
+		CleanStart: true,
+		Props: NewProperties(
+			Property{PropID: SessionExpiryInterval, Payload: Int32PropPayload(100)},
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key", "value"}},
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key2", "value2"}},
 		),
-		payload: ConnectPayload{
-			clientID:    "",
-			willProps:   nil,
-			willRetain:  false,
-			willQoS:     Qos0,
-			willTopic:   "",
-			willPayload: nil,
-			username:    "",
-			password:    nil,
+		Payload: ConnectPayload{
+			ClientID:    "",
+			WillProps:   nil,
+			WillRetain:  false,
+			WillQoS:     Qos0,
+			WillTopic:   "",
+			WillPayload: nil,
+			Username:    "",
+			Password:    nil,
 		},
 	}
 
 	connect3 = Connect{
-		keepAlive:  100,
-		cleanStart: true,
-		props: NewProperties(
-			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
+		KeepAlive:  100,
+		CleanStart: true,
+		Props: NewProperties(
+			Property{PropID: SessionExpiryInterval, Payload: Int32PropPayload(100)},
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key", "value"}},
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key2", "value2"}},
 		),
-		payload: ConnectPayload{
-			clientID:    "",
-			willProps:   nil,
-			willRetain:  false,
-			willQoS:     Qos0,
-			willTopic:   "",
-			willPayload: nil,
-			username:    "",
-			password:    nil,
+		Payload: ConnectPayload{
+			ClientID:    "",
+			WillProps:   nil,
+			WillRetain:  false,
+			WillQoS:     Qos0,
+			WillTopic:   "",
+			WillPayload: nil,
+			Username:    "",
+			Password:    nil,
 		},
 	}
 
 	connect4 = Connect{
-		keepAlive:  100,
-		cleanStart: false,
-		props: NewProperties(
-			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key2", "value2")},
+		KeepAlive:  100,
+		CleanStart: false,
+		Props: NewProperties(
+			Property{PropID: SessionExpiryInterval, Payload: Int32PropPayload(100)},
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key", "value"}},
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key2", "value2"}},
 		),
-		payload: ConnectPayload{
-			clientID: "clientID",
-			willProps: NewProperties(
-				Property{propID: UserProperty, payload: NewKeyValuePropPayload("willKey", "willValue")},
+		Payload: ConnectPayload{
+			ClientID: "clientID",
+			WillProps: NewProperties(
+				Property{PropID: UserProperty, Payload: KeyValuePropPayload{"willKey", "willValue"}},
 			),
-			willRetain:  true,
-			willQoS:     Qos2,
-			willTopic:   "/will/topic",
-			willPayload: []byte("willPayload"),
-			username:    "user",
-			password:    []byte("pwd"),
+			WillRetain:  true,
+			WillQoS:     Qos2,
+			WillTopic:   "/will/topic",
+			WillPayload: []byte("willPayload"),
+			Username:    "user",
+			Password:    []byte("pwd"),
 		},
 	}
 
 	connect5 = Connect{
-		keepAlive:  10,
-		cleanStart: true,
-		props: NewProperties(
-			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(10)},
+		KeepAlive:  10,
+		CleanStart: true,
+		Props: NewProperties(
+			Property{PropID: SessionExpiryInterval, Payload: Int32PropPayload(10)},
 		),
-		payload: ConnectPayload{
-			clientID:    "",
-			willProps:   nil,
-			willRetain:  false,
-			willQoS:     Qos0,
-			willTopic:   "",
-			willPayload: nil,
-			username:    "",
-			password:    nil,
+		Payload: ConnectPayload{
+			ClientID:    "",
+			WillProps:   nil,
+			WillRetain:  false,
+			WillQoS:     Qos0,
+			WillTopic:   "",
+			WillPayload: nil,
+			Username:    "",
+			Password:    nil,
 		},
 	}
 
@@ -254,20 +254,20 @@ var (
 	)
 
 	connack1 = Connack{
-		connectReason:  ConnectSuccess,
-		sessionPresent: true,
-		props: NewProperties(
-			Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
-			Property{propID: MaximumPacketSize, payload: Int32PropPayload(1 << 16)},
+		ConnectReason:  ConnectSuccess,
+		SessionPresent: true,
+		Props: NewProperties(
+			Property{PropID: AssignedClientIdentifier, Payload: StringPropPayload("client")},
+			Property{PropID: MaximumPacketSize, Payload: Int32PropPayload(1 << 16)},
 		),
 	}
 
 	connack2 = Connack{
-		connectReason:  ConnectSuccess,
-		sessionPresent: false,
-		props: NewProperties(
-			Property{propID: AssignedClientIdentifier, payload: StringPropPayload("client")},
-			Property{propID: MaximumQoS, payload: BytePropPayload(Qos1)},
+		ConnectReason:  ConnectSuccess,
+		SessionPresent: false,
+		Props: NewProperties(
+			Property{PropID: AssignedClientIdentifier, Payload: StringPropPayload("client")},
+			Property{PropID: MaximumQoS, Payload: BytePropPayload(Qos1)},
 		),
 	}
 
@@ -332,33 +332,33 @@ var (
 	)
 
 	disconnect1 = Disconnect{
-		reason: DisconnectImplementationSpecificError,
-		props: NewProperties(
-			Property{propID: ReasonString, payload: StringPropPayload("error")},
-			Property{propID: SessionExpiryInterval, payload: Int32PropPayload(100)},
+		Reason: DisconnectImplementationSpecificError,
+		Props: NewProperties(
+			Property{PropID: ReasonString, Payload: StringPropPayload("error")},
+			Property{PropID: SessionExpiryInterval, Payload: Int32PropPayload(100)},
 		),
 	}
 
 	disconnect2 = Disconnect{
-		reason: DisconnectNormalDisconnection,
-		props: NewProperties(
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
+		Reason: DisconnectNormalDisconnection,
+		Props: NewProperties(
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key", "value"}},
 		),
 	}
 
 	disconnect3 = Disconnect{
-		reason: DisconnectNormalDisconnection,
-		props:  NewProperties(),
+		Reason: DisconnectNormalDisconnection,
+		Props:  NewProperties(),
 	}
 
 	disconnect4 = Disconnect{
-		reason: DisconnectNormalDisconnection,
-		props:  NewProperties(),
+		Reason: DisconnectNormalDisconnection,
+		Props:  NewProperties(),
 	}
 
 	disconnect5 = Disconnect{
-		reason: DisconnectNormalDisconnection,
-		props:  NewProperties(),
+		Reason: DisconnectNormalDisconnection,
+		Props:  NewProperties(),
 	}
 
 	subscribe1Bin = help.NewByteSequence(
@@ -408,41 +408,41 @@ var (
 	)
 
 	subscribe1 = Subscribe{
-		packetID: 100,
-		props: NewProperties(
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(10000)},
+		PacketID: 100,
+		Props: NewProperties(
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key", "value"}},
+			Property{PropID: SubscriptionIdentifier, Payload: VarIntPropPayload(10000)},
 		),
-		filters: []SubscriptionFilter{
+		Filters: []SubscriptionFilter{
 			{
-				filter:            "/topic1",
-				maxQoS:            Qos0,
-				noLocal:           false,
-				retainAsPublished: false,
-				retainHandling:    0,
+				Filter:            "/topic1",
+				MaxQoS:            Qos0,
+				NoLocal:           false,
+				RetainAsPublished: false,
+				RetainHandling:    0,
 			},
 			{
-				filter:            "/topic2",
-				maxQoS:            Qos1,
-				noLocal:           true,
-				retainAsPublished: true,
-				retainHandling:    1,
+				Filter:            "/topic2",
+				MaxQoS:            Qos1,
+				NoLocal:           true,
+				RetainAsPublished: true,
+				RetainHandling:    1,
 			},
 		},
 	}
 
 	subscribe2 = Subscribe{
-		packetID: 1000,
-		props: NewProperties(
-			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(1000)},
+		PacketID: 1000,
+		Props: NewProperties(
+			Property{PropID: SubscriptionIdentifier, Payload: VarIntPropPayload(1000)},
 		),
-		filters: []SubscriptionFilter{
+		Filters: []SubscriptionFilter{
 			{
-				filter:            "/topic3",
-				maxQoS:            Qos2,
-				noLocal:           false,
-				retainAsPublished: false,
-				retainHandling:    2,
+				Filter:            "/topic3",
+				MaxQoS:            Qos2,
+				NoLocal:           false,
+				RetainAsPublished: false,
+				RetainHandling:    2,
 			},
 		},
 	}
@@ -494,12 +494,12 @@ var (
 	)
 
 	suback1 = Suback{
-		packetID: 100,
-		props: NewProperties(
-			Property{propID: UserProperty, payload: NewKeyValuePropPayload("key", "value")},
-			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(10000)},
+		PacketID: 100,
+		Props: NewProperties(
+			Property{PropID: UserProperty, Payload: KeyValuePropPayload{"key", "value"}},
+			Property{PropID: SubscriptionIdentifier, Payload: VarIntPropPayload(10000)},
 		),
-		reasons: []SubackReason{
+		Reasons: []SubackReason{
 			SubackGrantedQoS2,
 			SubackGrantedQoS0,
 			SubackQuotaExceeded,
@@ -507,11 +507,11 @@ var (
 	}
 
 	suback2 = Suback{
-		packetID: 1000,
-		props: NewProperties(
-			Property{propID: SubscriptionIdentifier, payload: VarIntPropPayload(1000)},
+		PacketID: 1000,
+		Props: NewProperties(
+			Property{PropID: SubscriptionIdentifier, Payload: VarIntPropPayload(1000)},
 		),
-		reasons: []SubackReason{
+		Reasons: []SubackReason{
 			SubackGrantedQoS0,
 			SubackImplementationSpecificError,
 		},
@@ -560,27 +560,27 @@ var (
 	)
 
 	publish1 = Publish{
-		dup:      false,
-		qos:      Qos0,
-		retain:   false,
-		topic:    topic.Topic{Levels: []string{"device", "abc"}},
-		packetID: 100,
-		props:    NewProperties(
-			Property{propID: MessageExpiryInterval, payload: Int32PropPayload(50)},
+		Dup:      false,
+		Qos:      Qos0,
+		Retain:   false,
+		Topic:    topic.Topic{Levels: []string{"device", "abc"}},
+		PacketID: 100,
+		Props:    NewProperties(
+			Property{PropID: MessageExpiryInterval, Payload: Int32PropPayload(50)},
 		),
-		payload:  []byte("payload"),
+		Payload:  []byte("payload"),
 	}
 
 	publish2 = Publish{
-		dup:      true,
-		qos:      Qos2,
-		retain:   true,
-		topic:    topic.Topic{Levels: []string{"device", "abc", "temp"}},
-		packetID: 100,
-		props:    NewProperties(
-			Property{propID: MessageExpiryInterval, payload: Int32PropPayload(50)},
-			Property{propID: PayloadFormatIndicator, payload: BytePropPayload(1)},
+		Dup:      true,
+		Qos:      Qos2,
+		Retain:   true,
+		Topic:    topic.Topic{Levels: []string{"device", "abc", "temp"}},
+		PacketID: 100,
+		Props:    NewProperties(
+			Property{PropID: MessageExpiryInterval, Payload: Int32PropPayload(50)},
+			Property{PropID: PayloadFormatIndicator, Payload: BytePropPayload(1)},
 		),
-		payload:  []byte("payload"),
+		Payload:  []byte("payload"),
 	}
 )

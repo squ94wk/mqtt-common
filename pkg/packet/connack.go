@@ -9,39 +9,9 @@ import (
 
 //Connack defines the connack control packet.
 type Connack struct {
-	sessionPresent bool
-	connectReason  ConnectReason
-	props          Properties
-}
-
-//SessionPresent returns the value of the session present flag.
-func (c Connack) SessionPresent() bool {
-	return c.sessionPresent
-}
-
-//SetSessionPresent sets the value of the session present flag.
-func (c *Connack) SetSessionPresent(present bool) {
-	c.sessionPresent = present
-}
-
-//ConnectReason returns the value of the connect reason.
-func (c Connack) ConnectReason() ConnectReason {
-	return c.connectReason
-}
-
-//SetConnectReason sets the value of the connect reason.
-func (c *Connack) SetConnectReason(reason ConnectReason) {
-	c.connectReason = reason
-}
-
-//Props returns the properties of the connack control packet.
-func (c Connack) Props() Properties {
-	return c.props
-}
-
-//SetProps replaces the properties of the connack control packet.
-func (c *Connack) SetProps(props map[uint32][]Property) {
-	c.props = props
+	SessionPresent bool
+	ConnectReason  ConnectReason
+	Props          Properties
 }
 
 //WriteTo writes the connack control packet to writer according to the mqtt protocol.
@@ -57,7 +27,7 @@ func (c Connack) WriteTo(writer io.Writer) (int64, error) {
 
 	//3.2.2 Variable header
 	var remainingLength uint32 = 1 + 1 // flags = session present, connect reason
-	remainingLength += c.props.size()
+	remainingLength += c.Props.size()
 	// no payload
 	n2, err := types.WriteVarIntTo(writer, remainingLength)
 	n += n2
@@ -66,7 +36,7 @@ func (c Connack) WriteTo(writer io.Writer) (int64, error) {
 	}
 
 	var encFlags [1]byte
-	if c.sessionPresent {
+	if c.SessionPresent {
 		encFlags[0] = 1
 	} else {
 		encFlags[0] = 0
@@ -77,14 +47,14 @@ func (c Connack) WriteTo(writer io.Writer) (int64, error) {
 		return n, fmt.Errorf("failed to write connack packet: failed to write flags: %v", err)
 	}
 
-	connectReasonBuf := []byte{byte(c.connectReason)}
+	connectReasonBuf := []byte{byte(c.ConnectReason)}
 	n4, err := writer.Write(connectReasonBuf)
 	n += int64(n4)
 	if err != nil {
 		return n, fmt.Errorf("failed to write connack packet: failed to write connect reason: %v", err)
 	}
 
-	n5, err := c.props.WriteTo(writer)
+	n5, err := c.Props.WriteTo(writer)
 	n += n5
 	if err != nil {
 		return n, fmt.Errorf("failed to write connack packet: failed to write properties: %v", err)
@@ -106,10 +76,10 @@ func readConnack(reader io.Reader, connack *Connack) error {
 		return fmt.Errorf("failed to read connack packet: invalid value for flags: bits 7-1 are reserved and must be 0: got: '%v'", buf[0])
 	}
 	// 3.2.2.1.1 Session present
-	connack.SetSessionPresent(buf[0] == 1)
+	connack.SessionPresent = buf[0] == 1
 
 	// 3.2.2.2 Connect reason code
-	connack.SetConnectReason(ConnectReason(buf[1]))
+	connack.ConnectReason = ConnectReason(buf[1])
 	//TODO: check for allowed values
 
 	// 3.2.2.3 Connack properties
@@ -117,7 +87,7 @@ func readConnack(reader io.Reader, connack *Connack) error {
 	if err != nil {
 		return fmt.Errorf("failed to read connack packet: failed to read properties: %v", err)
 	}
-	connack.props = props
+	connack.Props = props
 
 	return nil
 }

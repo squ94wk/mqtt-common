@@ -10,142 +10,22 @@ import (
 
 //Connect defines the connect control packet.
 type Connect struct {
-	keepAlive  uint16
-	cleanStart bool
-	props      Properties
-	payload    ConnectPayload
+	KeepAlive  uint16
+	CleanStart bool
+	Props      Properties
+	Payload    ConnectPayload
 }
 
 //ConnectPayload defines the payload of a connect control packet.
 type ConnectPayload struct {
-	clientID    string
-	willProps   Properties
-	willRetain  bool
-	willQoS     byte
-	willTopic   string
-	willPayload []byte
-	username    string
-	password    []byte
-}
-
-//KeepAlive returns the keep alive duration of the connect control packet in seconds.
-func (c Connect) KeepAlive() uint16 {
-	return c.keepAlive
-}
-
-//SetKeepAlive sets the keep alive duration of the connect control packet in seconds.
-func (c *Connect) SetKeepAlive(value uint16) {
-	c.keepAlive = value
-}
-
-//CleanStart returns the value of the clean start flag of the connect control packet.
-func (c Connect) CleanStart() bool {
-	return c.cleanStart
-}
-
-//SetCleanStart sets the value of the clean start flag of the connect control packet.
-func (c *Connect) SetCleanStart(cleanStart bool) {
-	c.cleanStart = cleanStart
-}
-
-//Props returns the properties of the connect control packet.
-func (c Connect) Props() Properties {
-	return c.props
-}
-
-//SetProps replaces the properties of the connect control packet.
-func (c *Connect) SetProps(props Properties) {
-	c.props = props
-}
-
-//Payload returns the payload of the connect control packet.
-func (c Connect) Payload() ConnectPayload {
-	return c.payload
-}
-
-//SetPayload sets the payload of the connect control packet.
-func (c *Connect) SetPayload(payload ConnectPayload) {
-	c.payload = payload
-}
-
-//ClientID returns the client ID of the connect control packet payload.
-func (p ConnectPayload) ClientID() string {
-	return p.clientID
-}
-
-//SetClientID sets the client ID of the connect control packet payload.
-func (p *ConnectPayload) SetClientID(clientID string) {
-	p.clientID = clientID
-}
-
-//WillProps returns the properties of the will message of the connect control packet.
-func (p ConnectPayload) WillProps() Properties {
-	return p.willProps
-}
-
-//SetWillProps replaces the properties of the will message of the connect control packet.
-func (p *ConnectPayload) SetWillProps(props Properties) {
-	p.willProps = props
-}
-
-//WillTopic returns the topic of the will message of the connect control packet.
-func (p ConnectPayload) WillTopic() string {
-	return p.willTopic
-}
-
-//SetWillTopic sets the topic of the will message of the connect control packet.
-func (p *ConnectPayload) SetWillTopic(topic string) {
-	p.willTopic = topic
-}
-
-//WillQoS returns the quality of service level of the will message of the connect control packet.
-func (p ConnectPayload) WillQoS() byte {
-	return p.willQoS
-}
-
-//SetWillQoS sets the quality of service level of the will message of the connect control packet.
-func (p *ConnectPayload) SetWillQoS(qos byte) {
-	p.willQoS = qos
-}
-
-//WillPayload returns the payload of the will message of the connect control packet.
-func (p ConnectPayload) WillPayload() []byte {
-	return p.willPayload
-}
-
-//SetWillPayload sets the payload of the will message of the connect control packet.
-func (p *ConnectPayload) SetWillPayload(payload []byte) {
-	p.willPayload = payload
-}
-
-//Username returns the user name of the connect control packet.
-func (p ConnectPayload) Username() string {
-	return p.username
-}
-
-//SetUsername sets the user name of the connect control packet.
-func (p *ConnectPayload) SetUsername(username string) {
-	p.username = username
-}
-
-//Password returns the password of the connect control packet.
-func (p ConnectPayload) Password() []byte {
-	return p.password
-}
-
-//SetPassword sets the password of the connect control packet.
-func (p *ConnectPayload) SetPassword(password []byte) {
-	p.password = password
-}
-
-//WillRetain returns the value of the will retain flag of the connect control packet.
-func (p ConnectPayload) WillRetain() bool {
-	return p.willRetain
-}
-
-//SetWillRetain sets the value of the will retain flag of the connect control packet.
-func (p *ConnectPayload) SetWillRetain(willRetain bool) {
-	p.willRetain = willRetain
+	ClientID    string
+	WillProps   Properties
+	WillRetain  bool
+	WillQoS     byte
+	WillTopic   string
+	WillPayload []byte
+	Username    string
+	Password    []byte
 }
 
 //WriteTo writes the connect control packet to writer according to the mqtt protocol.
@@ -183,18 +63,18 @@ func writeFixedConnectHeader(c Connect, writer io.Writer) (int64, error) {
 
 	// Remaining length
 	var remainingLength uint32 = 7 + 1 + 2 // protocol name & version, flags, keep alive
-	remainingLength += c.props.size()
-	remainingLength += types.StringSize(c.payload.clientID)
-	if c.payload.willTopic != "" {
-		remainingLength += c.payload.willProps.size()
-		remainingLength += types.StringSize(c.payload.willTopic)
-		remainingLength += types.BinarySize(c.payload.willPayload)
+	remainingLength += c.Props.size()
+	remainingLength += types.StringSize(c.Payload.ClientID)
+	if c.Payload.WillTopic != "" {
+		remainingLength += c.Payload.WillProps.size()
+		remainingLength += types.StringSize(c.Payload.WillTopic)
+		remainingLength += types.BinarySize(c.Payload.WillPayload)
 	}
-	if c.payload.username != "" {
-		remainingLength += types.StringSize(c.payload.username)
+	if c.Payload.Username != "" {
+		remainingLength += types.StringSize(c.Payload.Username)
 	}
-	if c.payload.password != nil {
-		remainingLength += types.BinarySize(c.payload.password)
+	if c.Payload.Password != nil {
+		remainingLength += types.BinarySize(c.Payload.Password)
 	}
 	n2, err := types.WriteVarIntTo(writer, remainingLength)
 	n += n2
@@ -219,28 +99,28 @@ func writeVariableConnectHeader(c Connect, writer io.Writer) (int64, error) {
 	var flags byte
 	// reserved
 	flags |= 0
-	if c.cleanStart {
+	if c.CleanStart {
 		flags |= 1 << 1
 	}
-	if c.payload.willTopic != "" {
+	if c.Payload.WillTopic != "" {
 		flags |= 2 << 1
 	}
-	switch c.payload.willQoS {
+	switch c.Payload.WillQoS {
 	case Qos0:
 	case Qos1:
 		flags |= 1 << 3
 	case Qos2:
 		flags |= 2 << 3
 	default:
-		panic(fmt.Errorf("invalid option for QoS: %v", c.payload.willQoS))
+		panic(fmt.Errorf("invalid option for QoS: %v", c.Payload.WillQoS))
 	}
-	if c.payload.willRetain {
+	if c.Payload.WillRetain {
 		flags |= 1 << 5
 	}
-	if c.payload.password != nil {
+	if c.Payload.Password != nil {
 		flags |= 1 << 6
 	}
-	if c.payload.username != "" {
+	if c.Payload.Username != "" {
 		flags |= 1 << 7
 	}
 
@@ -251,14 +131,14 @@ func writeVariableConnectHeader(c Connect, writer io.Writer) (int64, error) {
 	}
 
 	// 3.1.2.10 Keep Alive
-	n3, err := types.WriteUInt16To(writer, c.keepAlive)
+	n3, err := types.WriteUInt16To(writer, c.KeepAlive)
 	n += n3
 	if err != nil {
 		return n, fmt.Errorf("failed to write keep alive: %v", err)
 	}
 
 	// 3.1.2.11 Properties
-	n4, err := c.props.WriteTo(writer)
+	n4, err := c.Props.WriteTo(writer)
 	n += n4
 	if err != nil {
 		return n, fmt.Errorf("failed to write properties: %v", err)
@@ -270,30 +150,30 @@ func writeVariableConnectHeader(c Connect, writer io.Writer) (int64, error) {
 func writeConnectPayload(c Connect, writer io.Writer) (int64, error) {
 	var n int64
 	// 3.1.3.1 ClientID
-	n1, err := types.WriteStringTo(writer, c.payload.clientID)
+	n1, err := types.WriteStringTo(writer, c.Payload.ClientID)
 	n += n1
 	if err != nil {
 		return n, fmt.Errorf("failed to write connect packet: failed to write client id: %v", err)
 	}
 
 	// 3.1.3.2 Will properties
-	if c.payload.willTopic != "" {
+	if c.Payload.WillTopic != "" {
 		// 3.1.3.2.1 Property length
-		n2, err := c.payload.willProps.WriteTo(writer)
+		n2, err := c.Payload.WillProps.WriteTo(writer)
 		n += n2
 		if err != nil {
 			return n, fmt.Errorf("failed to write connect packet: failed to write will properties: %v", err)
 		}
 
 		// 3.1.3.3 Will topic
-		n3, err := types.WriteStringTo(writer, c.payload.willTopic)
+		n3, err := types.WriteStringTo(writer, c.Payload.WillTopic)
 		n += n3
 		if err != nil {
 			return n, fmt.Errorf("failed to write connect packet: failed to write will topic: %v", err)
 		}
 
 		// 3.1.3.4 Will payload
-		n4, err := types.WriteBinaryTo(writer, c.payload.willPayload)
+		n4, err := types.WriteBinaryTo(writer, c.Payload.WillPayload)
 		n += n4
 		if err != nil {
 			return n, fmt.Errorf("failed to write connect packet: failed to write will payload: %v", err)
@@ -301,8 +181,8 @@ func writeConnectPayload(c Connect, writer io.Writer) (int64, error) {
 	}
 
 	// 3.1.3.5 User name
-	if c.payload.username != "" {
-		n5, err := types.WriteStringTo(writer, c.payload.username)
+	if c.Payload.Username != "" {
+		n5, err := types.WriteStringTo(writer, c.Payload.Username)
 		n += n5
 		if err != nil {
 			return n, fmt.Errorf("failed to write connect packet: failed to write username: %v", err)
@@ -310,8 +190,8 @@ func writeConnectPayload(c Connect, writer io.Writer) (int64, error) {
 	}
 
 	// 3.1.3.6 Password
-	if c.payload.password != nil {
-		n6, err := types.WriteBinaryTo(writer, c.payload.password)
+	if c.Payload.Password != nil {
+		n6, err := types.WriteBinaryTo(writer, c.Payload.Password)
 		n += n6
 		if err != nil {
 			return n, fmt.Errorf("failed to write Connect packet: failed to write password: %v", err)
@@ -361,7 +241,7 @@ func readConnect(reader io.Reader, connect *Connect) error {
 		}
 	}
 
-	connect.SetCleanStart(cleanStart)
+	connect.CleanStart = cleanStart
 
 	// 3.1.2.6 Will QoS
 	if willQoS > 2 {
@@ -373,18 +253,18 @@ func readConnect(reader io.Reader, connect *Connect) error {
 	if err != nil {
 		return fmt.Errorf("failed to read connect packet: failed to read keepAlive: %v", err)
 	}
-	connect.SetKeepAlive(keepAlive)
+	connect.KeepAlive = keepAlive
 
 	// 3.1.2.11 Properties
 	props, err := readProperties(reader)
 	if err != nil {
 		return fmt.Errorf("failed to read connect packet: failed to read properties: %v", err)
 	}
-	connect.props = props
+	connect.Props = props
 
 	// 3.1.3 Payload
 	payload := ConnectPayload{}
-	payload.SetWillRetain(willRetain)
+	payload.WillRetain = willRetain
 	// 3.1.3.1 ClientID
 	clientID, err := types.ReadString(reader)
 	if err != nil {
@@ -395,31 +275,31 @@ func readConnect(reader io.Reader, connect *Connect) error {
 		return fmt.Errorf("malformed packet: ClientID too long (%d), must be between 1 and 23 char long", clientIDLength)
 	}
 	//TODO: check characters are only in a-zA-Z0-9
-	payload.SetClientID(clientID)
+	payload.ClientID = clientID
 
 	if hasWill {
-		payload.SetWillQoS(willQoS)
+		payload.WillQoS = willQoS
 
 		// 3.1.3.2 Will properties
 		willProps, err := readProperties(reader)
 		if err != nil {
 			return fmt.Errorf("failed to read connect packet: failed to read will properties: %v", err)
 		}
-		payload.willProps = willProps
+		payload.WillProps = willProps
 
 		// 3.1.3.3 Will topic
 		willTopic, err := types.ReadString(reader)
 		if err != nil {
 			return fmt.Errorf("failed to read will topic: %v", err)
 		}
-		payload.SetWillTopic(willTopic)
+		payload.WillTopic = willTopic
 
 		// 3.1.3.4 Will payload
 		willPayload, err := types.ReadBinary(reader)
 		if err != nil {
 			return fmt.Errorf("failed to read will payload: %v", err)
 		}
-		payload.SetWillPayload(willPayload)
+		payload.WillPayload = willPayload
 	}
 
 	// 3.1.3.5 User name
@@ -428,7 +308,7 @@ func readConnect(reader io.Reader, connect *Connect) error {
 		if err != nil {
 			return fmt.Errorf("failed to read username: %v", err)
 		}
-		payload.SetUsername(username)
+		payload.Username = username
 	}
 
 	// 3.1.3.6 Password
@@ -437,9 +317,9 @@ func readConnect(reader io.Reader, connect *Connect) error {
 		if err != nil {
 			return fmt.Errorf("failed to read password: %v", err)
 		}
-		payload.SetPassword(password)
+		payload.Password = password
 	}
 
-	connect.payload = payload
+	connect.Payload = payload
 	return nil
 }

@@ -10,13 +10,13 @@ import (
 //WriteTo writes a property to writer according to the mqtt protocol.
 func (p Property) WriteTo(writer io.Writer) (int64, error) {
 	var n int64
-	n1, err := types.WriteVarIntTo(writer, p.propID)
+	n1, err := types.WriteVarIntTo(writer, p.PropID)
 	n += n1
 	if err != nil {
 		return n, fmt.Errorf("failed to write property: failed to write identifier: %v", err)
 	}
 
-	n2, err := p.payload.WriteTo(writer)
+	n2, err := p.Payload.WriteTo(writer)
 	n += n2
 	if err != nil {
 		return n, fmt.Errorf("failed to write property: failed to write payload: %v", err)
@@ -32,7 +32,7 @@ func (p Properties) WriteTo(writer io.Writer) (int64, error) {
 	for propID, propsForID := range p {
 		for _, prop := range propsForID {
 			propsSize += types.VarIntSize(propID)
-			propsSize += prop.payload.size()
+			propsSize += prop.Payload.size()
 		}
 	}
 	n1, err := types.WriteVarIntTo(writer, propsSize)
@@ -46,7 +46,7 @@ func (p Properties) WriteTo(writer io.Writer) (int64, error) {
 			n2, err := prop.WriteTo(writer)
 			n += n2
 			if err != nil {
-				return n, fmt.Errorf("failed to write properties: failed to write property with id '%d': %v", prop.PropID(), err)
+				return n, fmt.Errorf("failed to write properties: failed to write property with id '%d': %v", prop.PropID, err)
 			}
 		}
 	}
@@ -96,13 +96,13 @@ func (p StringPropPayload) WriteTo(writer io.Writer) (int64, error) {
 //WriteTo writes the key value property to writer according to the mqtt protocol.
 func (p KeyValuePropPayload) WriteTo(writer io.Writer) (int64, error) {
 	var n int64
-	n1, err := types.WriteStringTo(writer, p.key)
+	n1, err := types.WriteStringTo(writer, p.Key)
 	n += n1
 	if err != nil {
 		return n, fmt.Errorf("failed to write string pair property. failed to write key: %v", err)
 	}
 
-	n2, err := types.WriteStringTo(writer, p.value)
+	n2, err := types.WriteStringTo(writer, p.Value)
 	n += n2
 	if err != nil {
 		return n, fmt.Errorf("failed to write string pair property. failed to write value: %v", err)

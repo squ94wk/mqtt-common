@@ -9,39 +9,9 @@ import (
 
 //Suback defines the suback control packet.
 type Suback struct {
-	packetID uint16
-	props    Properties
-	reasons  []SubackReason
-}
-
-//PacketID returns the value of the suback control packet.
-func (s Suback) PacketID() uint16 {
-	return s.packetID
-}
-
-//SetPacketID sets the value of the suback control packet.
-func (s *Suback) SetPacketID(packetID uint16) {
-	s.packetID = packetID
-}
-
-//Props returns the properties of the suback control packet.
-func (s Suback) Props() Properties {
-	return s.props
-}
-
-//SetProps replaces the properties of the suback control packet.
-func (s *Suback) SetProps(props map[uint32][]Property) {
-	s.props = props
-}
-
-//Reasons returns to each subscription the corresponding highest supported QoS or an error reason code.
-func (s Suback) Reasons() []SubackReason {
-	return s.reasons
-}
-
-//SetReasons sets the reason codes for all subscriptions.
-func (s *Suback) SetReasons(reasons []SubackReason) {
-	s.reasons = reasons
+	PacketID uint16
+	Props    Properties
+	Reasons  []SubackReason
 }
 
 //WriteTo writes the suback control packet to writer according to the mqtt protocol.
@@ -57,28 +27,28 @@ func (s Suback) WriteTo(writer io.Writer) (int64, error) {
 
 	//3.8.2 Variable header
 	var remainingLength = types.UInt16Size // packetID
-	remainingLength += s.props.size()
-	remainingLength += uint32(len(s.reasons))
+	remainingLength += s.Props.size()
+	remainingLength += uint32(len(s.Reasons))
 	n2, err := types.WriteVarIntTo(writer, remainingLength)
 	n += n2
 	if err != nil {
 		return n, fmt.Errorf("failed to write suback packet: failed to write packet length: %v", err)
 	}
 
-	n4, err := types.WriteUInt16To(writer, s.packetID)
+	n4, err := types.WriteUInt16To(writer, s.PacketID)
 	n += n4
 	if err != nil {
 		return n, fmt.Errorf("failed to write suback packet: failed to write packetID: %v", err)
 	}
 
-	n5, err := s.props.WriteTo(writer)
+	n5, err := s.Props.WriteTo(writer)
 	n += n5
 	if err != nil {
 		return n, fmt.Errorf("failed to write suback packet: failed to write properties: %v", err)
 	}
 
-	reasonsBuf := make([]byte, len(s.reasons))
-	for i, reason := range s.reasons {
+	reasonsBuf := make([]byte, len(s.Reasons))
+	for i, reason := range s.Reasons {
 		reasonsBuf[i] = byte(reason)
 	}
 	n6, err := writer.Write(reasonsBuf)
@@ -97,14 +67,14 @@ func readSuback(reader io.Reader, suback *Suback) error {
 	if err != nil {
 		return fmt.Errorf("failed to read suback packet: failed to read packet ID: %v", err)
 	}
-	suback.SetPacketID(packetID)
+	suback.PacketID = packetID
 
 	// 3.8.2.2 Suback properties
 	props, err := readProperties(reader)
 	if err != nil {
 		return fmt.Errorf("failed to read suback packet: failed to read properties: %v", err)
 	}
-	suback.props = props
+	suback.Props = props
 
 	// 3.8.3 Payload
 	reasonBuf := make([]byte, reader.(*io.LimitedReader).N)
@@ -117,6 +87,6 @@ func readSuback(reader io.Reader, suback *Suback) error {
 	for i, reason := range reasonBuf {
 		reasons[i] = SubackReason(reason)
 	}
-	suback.SetReasons(reasons)
+	suback.Reasons = reasons
 	return nil
 }

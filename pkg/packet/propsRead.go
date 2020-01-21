@@ -47,7 +47,7 @@ func readProp(reader io.Reader) (Property, error) {
 	if err != nil {
 		return prop, fmt.Errorf("failed to read property: failed to read property identifier: '%v'", err)
 	}
-	prop.propID = propID
+	prop.PropID = propID
 
 	propReader, ok := propReaders[propID]
 	if !ok {
@@ -60,7 +60,7 @@ func readProp(reader io.Reader) (Property, error) {
 		return prop, fmt.Errorf("failed to read property with identifier '%d': %v", propID, err)
 	}
 
-	prop.payload = payload
+	prop.Payload = payload
 	return prop, nil
 }
 
@@ -82,11 +82,11 @@ func readProperties(reader io.Reader) (Properties, error) {
 			return props, fmt.Errorf("failed to read property: %v", err)
 		}
 
-		properties, ok := props[property.PropID()]
+		properties, ok := props[property.PropID]
 		if ok {
-			props[property.PropID()] = append(properties, property)
+			props[property.PropID] = append(properties, property)
 		} else {
-			props[property.PropID()] = []Property{property}
+			props[property.PropID] = []Property{property}
 		}
 	}
 	return props, nil
@@ -133,7 +133,7 @@ func readKeyValueProp(reader io.Reader) (PropertyPayload, error) {
 	if err != nil {
 		return KeyValuePropPayload{}, fmt.Errorf("failed to read string pair property: failed to read value: %v", err)
 	}
-	return KeyValuePropPayload{key: key, value: value}, nil
+	return KeyValuePropPayload{Key: key, Value: value}, nil
 }
 
 func readVarIntProp(reader io.Reader) (PropertyPayload, error) {
