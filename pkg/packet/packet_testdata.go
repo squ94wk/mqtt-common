@@ -3,6 +3,7 @@ package packet
 import (
 	"github.com/go-test/deep"
 	"github.com/squ94wk/mqtt-common/internal/help"
+	"github.com/squ94wk/mqtt-common/pkg/topic"
 )
 
 func init() {
@@ -514,5 +515,72 @@ var (
 			SubackGrantedQoS0,
 			SubackImplementationSpecificError,
 		},
+	}
+
+	publish1Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(PUBLISH) << 4, 27},
+			//variable header
+			//topic name
+			[]byte{0, 10},
+			[]byte("device/abc"),
+			//packetID
+			[]byte{0, 100},
+			//props length
+			[]byte{5},
+		),
+		//props
+		help.NewByteSegment([]byte{byte(MessageExpiryInterval), 0, 0, 0, 50}),
+		//payload
+		help.NewByteSegment([]byte("payload")),
+	)
+
+	publish2Bin = help.NewByteSequence(
+		help.InOrder,
+		help.NewByteSegment(
+			[]byte{byte(PUBLISH)<<4 | 1<<3 | 2<<1 | 1, 34},
+			//variable header
+			//topic name
+			[]byte{0, 15},
+			[]byte("device/abc/temp"),
+			//packetID
+			[]byte{0, 100},
+			//props length
+			[]byte{7},
+		),
+		//props
+		help.NewByteSequence(
+			help.AnyOrder,
+			help.NewByteSegment([]byte{byte(MessageExpiryInterval), 0, 0, 0, 50}),
+			help.NewByteSegment([]byte{byte(PayloadFormatIndicator), 1}),
+		),
+		//payload
+		help.NewByteSegment([]byte("payload")),
+	)
+
+	publish1 = Publish{
+		dup:      false,
+		qos:      Qos0,
+		retain:   false,
+		topic:    topic.Topic{Levels: []string{"device", "abc"}},
+		packetID: 100,
+		props:    NewProperties(
+			Property{propID: MessageExpiryInterval, payload: Int32PropPayload(50)},
+		),
+		payload:  []byte("payload"),
+	}
+
+	publish2 = Publish{
+		dup:      true,
+		qos:      Qos2,
+		retain:   true,
+		topic:    topic.Topic{Levels: []string{"device", "abc", "temp"}},
+		packetID: 100,
+		props:    NewProperties(
+			Property{propID: MessageExpiryInterval, payload: Int32PropPayload(50)},
+			Property{propID: PayloadFormatIndicator, payload: BytePropPayload(1)},
+		),
+		payload:  []byte("payload"),
 	}
 )
